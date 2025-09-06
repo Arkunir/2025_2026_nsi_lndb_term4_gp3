@@ -5,22 +5,10 @@ that sequentially predicts football match outcomes using historical match data.
 
 Assumptions:
 - You have CSV(s) of historical matches with columns at least:
-  ['date','home_team','away_team','home_goals','away_goals']
+  ['date','home_team','away_team','home_score','away_score']
 - Matches are chronological or will be sorted by date.
 
-Key parts:
-- preprocessing: compute Elo ratings, simple form features, head-to-head counts
-- Gym-style environment `FootballMatchEnv` that yields one match at a time
-- Discrete action space: {0: home win, 1: draw, 2: away win}
-- Reward: +1 correct, -0.5 incorrect (you can change to log-prob scoring)
-- Agent: example using stable-baselines3 PPO (policy gradient). If you prefer
-  another library, swap out the training bits.
-
-Run: `python rl_football_predictor.py --data matches.csv --train`
-
-NOTE: This is an educational starting point. Football outcome prediction is
-noisy and requires careful feature engineering, temporal cross-validation and
-robust backtesting before trusting live predictions.
+Run: `python rl_football_predictor.py --data international_football_results_1872_2017_combined.csv --train`
 """
 
 import argparse
@@ -51,12 +39,6 @@ def compute_elo(df: pd.DataFrame,
                 k: float = 20,
                 initial_elo: float = 1500,
                 home_field_advantage: float = 100) -> pd.DataFrame:
-    """
-    Adds rolling Elo ratings for home and away teams to the dataframe.
-    Returns a copy of df with columns: 'elo_home_pre', 'elo_away_pre'.
-
-    Simple Elo update using match result (1, 0.5, 0).
-    """
     df = df.copy()
     df = df.sort_values('date').reset_index(drop=True)
     teams = pd.unique(df[['home_team', 'away_team']].values.ravel('K'))
@@ -70,11 +52,9 @@ def compute_elo(df: pd.DataFrame,
         elo_home_pre.append(elo[h])
         elo_away_pre.append(elo[a])
 
-        # compute expected
         diff = (elo[h] + home_field_advantage) - elo[a]
         expected_home = 1 / (1 + 10 ** (-diff / 400))
 
-        # result
         if row['home_goals'] > row['away_goals']:
             res = 1.0
         elif row['home_goals'] == row['away_goals']:
@@ -91,7 +71,6 @@ def compute_elo(df: pd.DataFrame,
 
 
 def add_form_and_head2head(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
-    """Add simple 'form' features (points from last N matches) and head-to-head counts."""
     df = df.copy()
     df = df.sort_values('date').reset_index(drop=True)
 
@@ -106,11 +85,10 @@ def add_form_and_head2head(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     for _, row in df.iterrows():
         h, a = row['home_team'], row['away_team']
 
-        # compute form: points in last `window` matches
         def points_list(team):
             pts = 0
             recent = last_matches[team][-window:]
-            for gh, ga in recent:
+            for gh, ga, _ in recent:
                 if gh > ga:
                     pts += 3
                 elif gh == ga:
@@ -120,12 +98,6 @@ def add_form_and_head2head(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
         home_form.append(points_list(h))
         away_form.append(points_list(a))
 
-        # head-to-head last results (count of home wins for this pairing)
-        # naive: look over all past matches between these two teams
-        past = [m for m in last_matches[h] if m[2] == a] if False else None
-
-        # We'll maintain a simple dict of h2h counts instead
-        # initialize
         if 'h2h' not in locals():
             h2h = {}
         key = (h, a)
@@ -135,7 +107,6 @@ def add_form_and_head2head(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
         h2h_home_wins.append(hw)
         h2h_away_wins.append(aw)
 
-        # update last_matches and h2h
         last_matches[h].append((row['home_goals'], row['away_goals'], a))
         last_matches[a].append((row['away_goals'], row['home_goals'], h))
 
@@ -153,15 +124,6 @@ def add_form_and_head2head(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
 
 # --------------------------- Gym Environment ---------------------------
 class FootballMatchEnv(gym.Env):
-    """Custom environment where each step is a single match.
-
-    Observation: vector of numeric features for the match.
-    Action: discrete 0/1/2 -> home/draw/away
-    Reward: +1 correct, -0.5 incorrect
-
-    Episode: go through a slice of chronological matches (train/test split)
-    """
-
     metadata = {'render.modes': ['human']}
 
     def __init__(self, df: pd.DataFrame, feature_cols: List[str], start_idx=0, end_idx=None):
@@ -172,9 +134,7 @@ class FootballMatchEnv(gym.Env):
         self.end_idx = len(self.df) if end_idx is None else end_idx
         self.current_idx = self.start_idx
 
-        # action space: 3 discrete predictions
         self.action_space = spaces.Discrete(3)
-        # observation: float vector
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(len(feature_cols),), dtype=np.float32)
 
     def reset(self):
@@ -183,7 +143,6 @@ class FootballMatchEnv(gym.Env):
 
     def step(self, action):
         row = self.df.iloc[self.current_idx]
-        # determine actual outcome
         if row['home_goals'] > row['away_goals']:
             actual = 0
         elif row['home_goals'] == row['away_goals']:
@@ -217,7 +176,14 @@ class FootballMatchEnv(gym.Env):
 
 def prepare_dataset(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=['date'])
-    # ensure required columns
+    
+    # Renommer pour correspondre au script
+    rename_map = {
+        'home_score': 'home_goals',
+        'away_score': 'away_goals'
+    }
+    df = df.rename(columns=rename_map)
+
     required = ['date','home_team','away_team','home_goals','away_goals']
     for c in required:
         if c not in df.columns:
@@ -226,7 +192,6 @@ def prepare_dataset(path: str) -> pd.DataFrame:
     df = df.sort_values('date').reset_index(drop=True)
     df = compute_elo(df)
     df = add_form_and_head2head(df)
-    # basic feature list
     df['goal_diff'] = df['home_goals'] - df['away_goals']
     return df
 
@@ -235,7 +200,6 @@ def train_agent(df: pd.DataFrame, feature_cols: List[str], timesteps: int = 1000
     if PPO is None:
         raise ImportError("stable-baselines3 is not installed. Install with `pip install stable-baselines3`.")
 
-    # use first 80% chronological for training
     n = len(df)
     split = int(n * 0.8)
     train_env = FootballMatchEnv(df, feature_cols, start_idx=0, end_idx=split)
@@ -285,7 +249,6 @@ def main():
     args = parser.parse_args()
 
     df = prepare_dataset(args.data)
-
     feature_cols = ['elo_home_pre', 'elo_away_pre', 'home_form_pts', 'away_form_pts', 'h2h_home_wins', 'h2h_away_wins']
 
     if args.train:
