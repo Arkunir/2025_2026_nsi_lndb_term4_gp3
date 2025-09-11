@@ -20,6 +20,11 @@ def build_features_for_match(df, home_team, away_team, feature_cols, date=None):
     df = compute_elo(df)
     df = add_features(df)
 
+    # teams = set(df["home_team"]).union(set(df["away_team"]))
+    # if home_team not in teams or away_team not in teams:
+    #     raise ValueError(f"Les équipes {home_team} et/ou {away_team} sont invalides ou absentes des données.")
+
+
     # Filtrer uniquement les matchs entre ces 2 équipes ou impliquant au moins une des deux
     sub_df = df[(df["home_team"] == home_team) | (df["away_team"] == home_team) |
                 (df["home_team"] == away_team) | (df["away_team"] == away_team)]
