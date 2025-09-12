@@ -108,7 +108,6 @@ def get_current_elo(df, team_name, reference_date=None):
     
     return current_elo
 
-<<<<<<< HEAD
 def get_team_recent_form(df, team_name, reference_date=None, window=8):
     """Calcule la forme récente d'une équipe"""
     if reference_date is None:
@@ -157,38 +156,6 @@ def get_team_recent_form(df, team_name, reference_date=None, window=8):
     last_match_date = recent_matches.iloc[-1]['date']
     days_since_last = (reference_date - last_match_date).days
     
-=======
-    # teams = set(df["home_team"]).union(set(df["away_team"]))
-    # if home_team not in teams or away_team not in teams:
-    #     raise ValueError(f"Les équipes {home_team} et/ou {away_team} sont invalides ou absentes des données.")
-
-
-    # Filtrer uniquement les matchs entre ces 2 équipes ou impliquant au moins une des deux
-    sub_df = df[(df["home_team"] == home_team) | (df["away_team"] == home_team) |
-                (df["home_team"] == away_team) | (df["away_team"] == away_team)]
-
-    if sub_df.empty:
-        raise ValueError(f"Aucun historique trouvé pour {home_team} ou {away_team}")
-
-    # On prend le dernier match historique impliquant ces équipes
-    last_row = sub_df.iloc[-1]
-
-    # Construire un vecteur de features
-    match_features = last_row[feature_cols].values.astype(np.float32)
-
-    # Nettoyer les NaN et inf
-    match_features = np.nan_to_num(match_features, nan=0.0, posinf=0.0, neginf=0.0)
-
-    return match_features.reshape(1, -1)
-
-# ---------------- Fonction pour prédire ----------------
-def predict_match_probability(model, features):
-    obs = torch.tensor(features, dtype=torch.float32)
-    with torch.no_grad():
-        dist = model.policy.get_distribution(obs)
-        logits = dist.distribution.logits
-        probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
->>>>>>> fa06a3368754719e8b828c82eedc84ccec66317f
     return {
         'points': points,
         'goals_scored': goals_scored,
