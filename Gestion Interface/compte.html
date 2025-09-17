@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mon compte - BetFoot</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin:0;
+      background:#070707;
+      color: #fff;
+    }
+
+    header {
+      background:#E30613;
+      padding:10px 20px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+    }
+
+    nav a {
+      color:#fff;
+      margin:0 10px;
+      text-decoration:none;
+      font-weight:bold;
+      padding:5px 10px;
+      border-radius:5px;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .container {
+      max-width:900px;
+      margin:20px auto;
+      padding:20px;
+      background:#1a1a1a;
+      border-radius:10px;
+    }
+
+    h1 {
+      margin-bottom:10px;
+      color:#fff;
+    }
+
+    .solde {
+      font-size:18px;
+      padding:15px;
+      background:#222;
+      border-radius:8px;
+      margin-bottom:20px;
+    }
+
+    button {
+      background:#E30613;
+      color:#fff;
+      border:none;
+      padding:10px 20px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+      transition:0.3s;
+    }
+
+    button:hover {
+      background:#ff3b3b;
+    }
+
+    table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top:20px;
+    }
+
+    th, td {
+      padding:10px;
+      border-bottom:1px solid #333;
+      text-align:left;
+    }
+
+    th {
+      background:#E30613;
+      color:#fff;
+    }
+
+    td.gain {
+      color: #00ff00; /* vert pour gains */
+      font-weight:bold;
+    }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>BetFoot</h2>
+  <nav>
+    <a href="interface.html">Accueil</a>
+    <a href="live.html">Matchs en direct</a>
+    <a href="paris.html">Paris</a>
+    <a href="resultats.html">Résultats</a>
+    <a href="compte.html">Mon compte</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>Espace Mon compte</h1>
+  <div class="solde">Solde fictif : <span id="solde">1000</span> crédits</div>
+  <button onclick="recharger()">Recharger 500 crédits fictifs</button>
+
+  <h2>Historique des paris</h2>
+  <table id="historique">
+    <tr>
+      <th>Match</th>
+      <th>Mise</th>
+      <th>Gain potentiel</th>
+    </tr>
+    <!-- Exemple de ligne -->
+    <tr>
+      <td>France vs Espagne</td>
+      <td>100</td>
+      <td class="gain">185</td>
+    </tr>
+    <tr>
+      <td>Brésil vs Allemagne</td>
+      <td>50</td>
+      <td class="gain">95</td>
+    </tr>
+  </table>
+</div>
+
+<script>
+  let solde = 1000;
+
+  function recharger(){
+    solde += 500;
+    document.getElementById('solde').textContent = solde;
+    alert("500 crédits fictifs ajoutés !");
+  }
+</script>
+
+<!-- Encadré Admin / Panneau Admin -->
+<div class="admin-box" id="adminBox">
+    <h2>Espace Administrateur</h2>
+    <form id="adminForm">
+      <label for="adminUser">Identifiant :</label>
+      <input type="text" id="adminUser" placeholder="admin" required>
+      
+      <label for="adminPass">Mot de passe :</label>
+      <input type="password" id="adminPass" placeholder="admin123" required>
+      
+      <button type="submit">Se connecter</button>
+    </form>
+    <div id="adminMessage" style="margin-top:10px;color:#ff3b3b"></div>
+  </div>
+  
+  <div class="admin-panel" id="adminPanel" style="display:none;">
+    <h2>Tableau de bord Admin</h2>
+    
+    <!-- Modifier le solde -->
+    <div style="margin-bottom:15px;">
+      <label for="adminBalance">Modifier le solde :</label>
+      <input type="number" id="adminBalance" min="0">
+      <button onclick="updateBalance()">Mettre à jour</button>
+    </div>
+    
+    <!-- Historique des paris -->
+    <div style="margin-bottom:15px;">
+      <h3>Historique des paris</h3>
+      <div id="adminHistory"></div>
+    </div>
+    
+    <button onclick="logoutAdmin()" style="background:#b0050f; color:#fff; padding:5px 10px; border:none; border-radius:5px;">Se déconnecter</button>
+  </div>
+  
+  <style>
+  .admin-box, .admin-panel {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 2px solid #E30613;
+    padding: 20px;
+    width: 400px;
+    margin: 30px auto;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .admin-box input, .admin-panel input {
+    width: 70%;
+    padding: 5px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .admin-box button, .admin-panel button {
+    background-color: #E30613;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .admin-box button:hover, .admin-panel button:hover {
+    background-color: #b0050f;
+  }
+  .admin-panel .remove-btn {
+    background: #ff3b3b;
+    margin-top:5px;
+  }
+  </style>
+  
+  <script>
+  // variable globale pour le solde
+  let balance = 1000;
+  
+  // Connexion admin
+  document.getElementById('adminForm').addEventListener('submit', function(event){
+    event.preventDefault(); // empêche le rechargement
+    const user = document.getElementById('adminUser').value;
+    const pass = document.getElementById('adminPass').value;
+    const msg = document.getElementById('adminMessage');
+  
+    if(user === "admin" && pass === "admin123"){
+      msg.style.color = "#00ff00";
+      msg.textContent = "Connexion réussie !";
+      document.getElementById('adminBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('adminBalance').value = balance;
+      renderAdminHistory();
+    } else {
+      msg.style.color = "#ff3b3b";
+      msg.textContent = "Identifiant ou mot de passe incorrect.";
+    }
+  });
+  
+  // Déconnexion
+  function logoutAdmin(){
+    document.getElementById('adminBox').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('adminMessage').textContent = '';
+  }
+  
+  // Mettre à jour le solde
+  function updateBalance(){
+    const newBalance = Number(document.getElementById('adminBalance').value);
+    if(!isNaN(newBalance) && newBalance >=0){
+      balance = newBalance;
+      const balanceEl = document.getElementById('balance');
+      if(balanceEl) balanceEl.textContent = balance;
+      alert("Solde mis à jour !");
+    } else {
+      alert("Entrez une valeur valide !");
+    }
+  }
+  
+  // Affichage de l'historique admin avec suppression
+  function renderAdminHistory(){
+    const container = document.getElementById('adminHistory');
+    if(history.length===0){
+      container.innerHTML = '<div style="color:#ccc">Aucun pari effectué</div>';
+      return;
+    }
+    container.innerHTML = history.map((h, idx)=>{
+      const sel = h.selections.map(s=>`${s.home} vs ${s.away} (${s.odd})`).join('<br>');
+      return `<div style="border-bottom:1px solid #333; padding:8px 0">
+                <div style="font-size:13px;color:#ccc">${h.date}</div>
+                <div>Mise: ${h.stake} crédits — Potentiel: ${h.potential} crédits</div>
+                <div style="font-size:13px; margin-top:4px">${sel}</div>
+                <button class="remove-btn" onclick="removeBet(${idx})">Supprimer ce pari</button>
+              </div>`;
+    }).join('');
+  }
+  
+  // Supprimer un pari
+  function removeBet(idx){
+    if(confirm("Supprimer ce pari ?")){
+      history.splice(idx,1);
+      renderAdminHistory(); // mettre à jour l'affichage admin
+      renderHistory(); // mettre à jour l'affichage utilisateur
+    }
+  }
+  </script>
+  
+  
+  
+
+</body>
+</html>
