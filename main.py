@@ -22,7 +22,7 @@ MODEL_OUT = "ppo_football"
 
 # ---------------- Preprocessing ----------------
 
-def compute_elo(df, k=20, initial_elo=1500, home_adv=100):
+def compute_elo(df, k=20, initial_elo=1500, home_adv=0):
     df = df.copy().sort_values('date').reset_index(drop=True)
     teams = pd.unique(df[['home_team','away_team']].values.ravel())
     elo = {t: initial_elo for t in teams}
@@ -53,10 +53,10 @@ def add_features(df, window=5):
     last_matches = {t: [] for t in teams}
     h2h = {}
 
-    home_form, away_form = [], []
-    h2h_home, h2h_away = [], []
-    home_goal_avg, away_goal_avg = [], []
-    home_win_rate, away_win_rate = [], []
+    form_pts = []
+    h2h_wins = []
+    goal_diff_avg = []
+    win_rate = []
 
     for _, row in df.iterrows():
         h, a = row['home_team'], row['away_team']
@@ -69,12 +69,14 @@ def add_features(df, window=5):
                 elif gh == ga: points += 1
             return points
 
-        home_form.append(pts(h))
-        away_form.append(pts(a))
+        h_pts = pts(h)
+        a_pts = pts(a)
+        form_pts.append((h_pts + a_pts) / 2)
 
         key, revkey = (h, a), (a, h)
-        h2h_home.append(h2h.get(key, 0))
-        h2h_away.append(h2h.get(revkey, 0))
+        h2h_home = h2h.get(key, 0)
+        h2h_away = h2h.get(revkey, 0)
+        h2h_wins.append(h2h_home + h2h_away)
 
         def goal_avg(team):
             recent = last_matches[team][-window:]
@@ -85,17 +87,17 @@ def add_features(df, window=5):
 
         h_avg, h_con = goal_avg(h)
         a_avg, a_con = goal_avg(a)
-        home_goal_avg.append(h_avg - h_con)
-        away_goal_avg.append(a_avg - a_con)
+        goal_diff_avg.append(((h_avg - h_con) + (a_avg - a_con)) / 2)
 
-        def win_rate(team):
+        def win_rate_func(team):
             recent = last_matches[team][-window:]
             if not recent: return 0.0
             wins = sum([1 for gh, ga, _ in recent if gh > ga])
             return wins / len(recent)
 
-        home_win_rate.append(win_rate(h))
-        away_win_rate.append(win_rate(a))
+        h_win_rate = win_rate_func(h)
+        a_win_rate = win_rate_func(a)
+        win_rate.append((h_win_rate + a_win_rate) / 2)
 
         last_matches[h].append((row['home_goals'], row['away_goals'], a))
         last_matches[a].append((row['away_goals'], row['home_goals'], h))
@@ -105,14 +107,10 @@ def add_features(df, window=5):
         elif row['home_goals'] < row['away_goals']:
             h2h[revkey] = h2h.get(revkey, 0) + 1
 
-    df['home_form_pts'] = home_form
-    df['away_form_pts'] = away_form
-    df['h2h_home_wins'] = h2h_home
-    df['h2h_away_wins'] = h2h_away
-    df['home_goal_diff_avg'] = home_goal_avg
-    df['away_goal_diff_avg'] = away_goal_avg
-    df['home_win_rate'] = home_win_rate
-    df['away_win_rate'] = away_win_rate
+    df['form_pts'] = form_pts
+    df['h2h_wins'] = h2h_wins
+    df['goal_diff_avg'] = goal_diff_avg
+    df['win_rate'] = win_rate
 
     return df
 
@@ -179,16 +177,18 @@ def prepare_dataset(path, feature_cols):
 def train_agent(df, feature_cols, timesteps=100000, save_path='ppo_football'):
     if PPO is None:
         raise ImportError("Install stable-baselines3")
-    split = int(len(df) * 0.8)
-    env = FootballMatchEnv(df, feature_cols, 0, split)
+
+    # Utiliser 100% des données pour l'entraînement
+    env = FootballMatchEnv(df, feature_cols, 0, len(df))
     vec_env = DummyVecEnv([lambda: env])
 
-    policy_kwargs = dict(net_arch=[128, 128, 64])  # Réseau plus profond
+    policy_kwargs = dict(net_arch=[128, 128, 64])
     model = PPO('MlpPolicy', vec_env, verbose=1, learning_rate=0.0003, policy_kwargs=policy_kwargs)
     model.learn(total_timesteps=timesteps)
     model.save(save_path)
     print(f"Model saved to {save_path}")
     return model
+
 
 def evaluate_agent(df, feature_cols, model, start_idx=None):
     split = int(len(df) * 0.8)
@@ -216,9 +216,7 @@ def evaluate_agent(df, feature_cols, model, start_idx=None):
 
 if __name__ == "__main__":
     feature_cols = [
-        'elo_home_pre','elo_away_pre','home_form_pts','away_form_pts',
-        'h2h_home_wins','h2h_away_wins','home_goal_diff_avg','away_goal_diff_avg',
-        'home_win_rate','away_win_rate'
+        'elo_home_pre','elo_away_pre','form_pts','h2h_wins','goal_diff_avg','win_rate'
     ]
 
     print("Préparation des données...")

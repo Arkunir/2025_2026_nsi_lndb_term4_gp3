@@ -7,7 +7,7 @@ from tkinter import messagebox, ttk
 from datetime import datetime
 
 # ---------------- Charger le modèle ----------------
-MODEL_PATH = "ppo_football.zip"
+MODEL_PATH = "ppo_football"
 model = PPO.load(MODEL_PATH)
 
 # ---------------- Reimporter tes fonctions ----------------
@@ -67,13 +67,11 @@ def run_gui():
     # Charger les données (comme dans le premier fichier)
     df = pd.read_csv("international_football_results_1872_2017_combined.csv", parse_dates=["date"])
     df = df.rename(columns={"home_score": "home_goals", "away_score": "away_goals"})
+    df = df.dropna(subset=['home_team', 'away_team'])
     df = df.sort_values("date").reset_index(drop=True)
 
     feature_cols = [
-        'elo_home_pre','elo_away_pre','home_form_pts','away_form_pts',
-        'h2h_home_wins','h2h_away_wins',
-        'home_goal_diff_avg','away_goal_diff_avg',
-        'home_win_rate','away_win_rate'
+        'elo_home_pre','elo_away_pre','form_pts','h2h_wins','goal_diff_avg','win_rate'
     ]
     
     available_teams = get_available_teams(df)
@@ -119,11 +117,10 @@ def run_gui():
             
             # Affichage amélioré (du second fichier)
             result_text = (
-                f"🏠 Victoire {home_team}: {probs['home_win']:.1%}\n"
-                f"🤝 Match nul: {probs['draw']:.1%}\n"
-                f"✈️ Victoire {away_team}: {probs['away_win']:.1%}\n\n"
-                f"📊 Favori: {favorite}\n"
-                f"🎯 Confiance: {confidence:.1%}"
+                f"🏠 Victoire {home_team}: {probs['home_win']:.01%}\n"
+                f"🤝 Match nul: {probs['draw']:.01%}\n"
+                f"✈️ Victoire {away_team}: {probs['away_win']:.01%}\n\n"
+                f"🎯 Confiance: {confidence:.01%}"
             )
             
             messagebox.showinfo("🔮 Prédiction de match", result_text)
@@ -241,10 +238,7 @@ def predict_command_line(home_team, away_team):
     df = df.sort_values("date").reset_index(drop=True)
 
     feature_cols = [
-        'elo_home_pre','elo_away_pre','home_form_pts','away_form_pts',
-        'h2h_home_wins','h2h_away_wins',
-        'home_goal_diff_avg','away_goal_diff_avg',
-        'home_win_rate','away_win_rate'
+        'elo_home_pre','elo_away_pre','form_pts','h2h_wins','goal_diff_avg','win_rate'
     ]
     
     try:
