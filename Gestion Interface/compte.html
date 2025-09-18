@@ -133,13 +133,19 @@
 </div>
 
 <script>
-  let solde = 1000;
+  let solde = localStorage.getItem('userBalance') !== null 
+    ? Number(localStorage.getItem('userBalance')) 
+    : 1000;
 
-  function recharger(){
+    function recharger() {
     solde += 500;
     document.getElementById('solde').textContent = solde;
+
+    // Mettre à jour le solde dans localStorage
+    localStorage.setItem('userBalance', solde);
+
     alert("500 crédits fictifs ajoutés !");
-  }
+}
 </script>
 
 <!-- Encadré Admin / Panneau Admin -->
@@ -147,10 +153,10 @@
     <h2>Espace Administrateur</h2>
     <form id="adminForm">
       <label for="adminUser">Identifiant :</label>
-      <input type="text" id="adminUser" placeholder="admin" required>
+      <input type="text" id="adminUser" placeholder=" " required>
       
       <label for="adminPass">Mot de passe :</label>
-      <input type="password" id="adminPass" placeholder="admin123" required>
+      <input type="password" id="adminPass" placeholder=" " required>
       
       <button type="submit">Se connecter</button>
     </form>
@@ -215,7 +221,32 @@
   
   <script>
   // variable globale pour le solde
-  let balance = 1000;
+  let balance = localStorage.getItem('userBalance') !== null 
+        ? Number(localStorage.getItem('userBalance')) 
+        : 1000; // Valeur par défaut si aucune donnée n'est sauvegardée
+
+    // Restaurer le solde depuis localStorage au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+        const balanceEl = document.getElementById('solde');
+        if (balanceEl) balanceEl.textContent = balance;
+    });
+
+    // Mettre à jour le solde
+    function updateBalance() {
+        const newBalance = Number(document.getElementById('adminBalance').value);
+        if (!isNaN(newBalance) && newBalance >= 0) {
+            balance = newBalance;
+            const balanceEl = document.getElementById('solde');
+            if (balanceEl) balanceEl.textContent = balance;
+
+            // Sauvegarder le solde dans localStorage
+            localStorage.setItem('userBalance', balance);
+
+            alert("Solde mis à jour !");
+        } else {
+            alert("Entrez une valeur valide !");
+        }
+    }
   
   // Connexion admin
   document.getElementById('adminForm').addEventListener('submit', function(event){
@@ -242,19 +273,6 @@
     document.getElementById('adminBox').style.display = 'block';
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('adminMessage').textContent = '';
-  }
-  
-  // Mettre à jour le solde
-  function updateBalance(){
-    const newBalance = Number(document.getElementById('adminBalance').value);
-    if(!isNaN(newBalance) && newBalance >=0){
-      balance = newBalance;
-      const balanceEl = document.getElementById('balance');
-      if(balanceEl) balanceEl.textContent = balance;
-      alert("Solde mis à jour !");
-    } else {
-      alert("Entrez une valeur valide !");
-    }
   }
   
   // Affichage de l'historique admin avec suppression

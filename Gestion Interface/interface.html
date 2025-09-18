@@ -401,12 +401,21 @@
       renderSelections();
     })
 
-    document.getElementById('recharge').addEventListener('click', ()=>{
-      const add = 500;
-      balance += add;
-      balanceEl.textContent = balance;
-      alert('+'+add+' crédits fictifs chargés sur votre compte.');
-    })
+    document.getElementById('recharge').addEventListener('click', () => {
+      let solde = localStorage.getItem('userBalance') !== null 
+          ? Number(localStorage.getItem('userBalance')) 
+          : 1000;
+
+      solde += 500; // Ajoute 500 crédits
+      localStorage.setItem('userBalance', solde); // Met à jour le localStorage
+
+      const balanceEl = document.getElementById('balance');
+      if (balanceEl) {
+          balanceEl.textContent = solde; // Met à jour l'affichage
+      }
+
+      alert("500 crédits fictifs ajoutés !");
+    });
 
     document.getElementById('history-btn').addEventListener('click', ()=>{
       if(historyEl.style.display === 'none'){
@@ -442,5 +451,24 @@
     // Initialize
     renderSelections();
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const balanceEl = document.getElementById('balance'); // ID de l'élément affichant le solde
+      const storedBalance = localStorage.getItem('userBalance');
+      if (storedBalance !== null) {
+          balanceEl.textContent = storedBalance;
+      }
+    });
+    
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'userBalance') {
+          const balanceEl = document.getElementById('balance');
+          if (balanceEl) {
+              balanceEl.textContent = event.newValue;
+          }
+      }
+    });
+  </script>
 </body>
 </html>
+```
