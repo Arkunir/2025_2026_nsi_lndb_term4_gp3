@@ -11,7 +11,7 @@ df["date"] = pd.to_datetime(df["date"], errors="coerce")
 # Garder seulement les matchs depuis 1990
 df = df[df["date"].dt.year >= 1990].copy()
 
-# Créer une colonne "resultat"
+# Créer une colonne "resultat" (pour définir la récompense)
 def get_result(row):
     if row["home_score"] > row["away_score"]:
         return "HomeWin"
@@ -29,9 +29,19 @@ df["coefficient"] = df["date"].dt.year.apply(
     lambda y: (y - year_min) / (year_max - year_min) if year_max > year_min else 1
 )
 
-# Sauvegarder le fichier préparé
-output_path = "matches_prepared.csv"
-df.to_csv(output_path, index=False)
+# Garder seulement les colonnes utiles pour un RL agent
+df_prepared = df[[
+    "date", "home_team", "away_team", 
+    "home_score", "away_score", 
+    "resultat", "coefficient"
+]]
 
-print(f"Fichier préparé sauvegardé sous : {output_path}")
-print(df.head())
+# Trier chronologiquement (important pour l’apprentissage séquentiel)
+df_prepared = df_prepared.sort_values(by="date").reset_index(drop=True)
+
+# Sauvegarder le fichier préparé
+output_path = "matches_RL_ready.csv"
+df_prepared.to_csv(output_path, index=False)
+
+print(f"Fichier RL prêt sauvegardé sous : {output_path}")
+print(df_prepared.head())
