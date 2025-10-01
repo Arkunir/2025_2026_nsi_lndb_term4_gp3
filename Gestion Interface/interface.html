@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reproduction Betclic – Version Foot (transactions fictives)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --red:#E30613;
+      --dark:#121212;
+      --muted:#6b6b6b;
+      --bg:#0f1113;
+      --card:#151617;
+      --white:#ffffff;
+      --gain:#1db954;
+      --glass: rgba(255,255,255,0.03);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#071014);color:var(--white);min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:transparent}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700}
+    nav{display:flex;gap:18px;align-items:center}
+    nav a{color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600}
+
+    .container{max-width:1200px;margin:18px auto;padding:0 18px}
+    .top{display:flex;gap:18px;align-items:flex-start}
+
+    /* Main */
+    .main{flex:1}
+    .hero{background:var(--card);padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:12px}
+    .slider{display:flex;gap:10px;overflow:auto;padding-bottom:8px}
+    .card-match{min-width:210px;background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
+    .teams{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .team{display:flex;align-items:center;gap:10px}
+    .team .crest{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .meta{font-size:13px;color:var(--muted)}
+
+    .quick{display:flex;gap:10px}
+    .btn{background:var(--red);color:var(--white);border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    /* Matches list */
+    .matches{margin-top:16px;background:var(--card);padding:12px;border-radius:12px}
+    .match-row{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .match-row:last-child{border-bottom:none}
+    .match-info{display:flex;align-items:center;gap:12px;min-width:260px}
+    .odds{display:flex;gap:8px;align-items:center}
+    .odd{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;cursor:pointer}
+
+    /* Ticket */
+    aside.ticket{width:360px;margin-left:18px;background:linear-gradient(180deg, #0b0c0d, #0e0f11);border-radius:12px;padding:16px;min-height:220px}
+    .ticket h3{margin:0 0 8px 0}
+    .selection{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.04)}
+    .stake{display:flex;gap:8px;align-items:center;margin-top:12px}
+    input[type=number]{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--white);width:120px}
+    .potential{font-weight:700;color:var(--gain)}
+    .warning{background:rgba(227,6,19,0.08);color:var(--red);padding:8px;border-radius:8px;margin-top:12px;font-size:13px}
+
+    /* Account panel (small) */
+    .account{margin-top:18px;background:var(--card);padding:12px;border-radius:12px}
+    .balance{display:flex;align-items:center;justify-content:space-between}
+    .small-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--white);cursor:pointer}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .top{flex-direction:column}
+      aside.ticket{width:100%;margin-left:0}
+      .top{padding-bottom:0}
+    }
+
+    @media (max-width:480px){
+      nav{display:none}
+      .logo{width:40px;height:40px}
+      .card-match{min-width:180px}
+      .match-info{min-width:160px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand container" style="max-width:1200px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="logo">BF</div>
+        <div>
+          <div style="font-weight:700">BetFoot</div>
+          <div style="font-size:12px;color:var(--muted)">Reproduction Betclic — Version Foot</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#">Accueil</a>
+        <a href="#live">Matchs en direct</a>
+        <a href="#paris">Paris</a>
+        <a href="#resultats">Résultats</a>
+        <a href="compte.html">Mon compte</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="top">
+      <div class="main">
+        <section class="hero">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div>
+              <h2 style="margin:0">Prochains matchs internationaux</h2>
+              <p class="meta">Matchs entre équipes nationales — données fictives</p>
+            </div>
+            <div class="quick">
+              <button class="btn" id="quick-bet">Parier maintenant</button>
+              <button class="btn secondary" id="see-odds">Voir les cotes</button>
+            </div>
+          </div>
+
+          <div class="slider" id="slider">
+            <!-- Slider cards: only national teams -->
+            <div class="card-match">
+              <div class="teams">
+                <div class="team"><div class="crest">FR</div><div><strong>France</strong></div></div>
+                <div style="font-weight:700">2 - 1</div>
+                <div class="team"><div class="crest">BR</div><div><strong>Brésil</strong></div></div>
+              </div>
+              <div class="meta">12 Octobre 2025 — 21:00</div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <div class="odd">1.85</div>
+                <div class="odd">3.20</div>
+                <div class="odd">4.10</div>
+              </div>
+            </div>
+
+            <div class="card-match">
+              <div class="teams">
+                <div class="team"><div class="crest">AR</div><div><strong>Argentine</strong></div></div>
+                <div style="font-weight:700">vs</div>
+                <div class="team"><div class="crest">PT</div><div><strong>Portugal</strong></div></div>
+              </div>
+              <div class="meta">20 Novembre 2025 — 18:45</div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <div class="odd">2.10</div>
+                <div class="odd">3.00</div>
+                <div class="odd">3.50</div>
+              </div>
+            </div>
+
+            <div class="card-match">
+              <div class="teams">
+                <div class="team"><div class="crest">ES</div><div><strong>Espagne</strong></div></div>
+                <div style="font-weight:700">vs</div>
+                <div class="team"><div class="crest">DE</div><div><strong>Allemagne</strong></div></div>
+              </div>
+              <div class="meta">05 Décembre 2025 — 17:30</div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <div class="odd">1.95</div>
+                <div class="odd">3.40</div>
+                <div class="odd">4.00</div>
+              </div>
+            </div>
+
+            <div class="card-match">
+              <div class="teams">
+                <div class="team"><div class="crest">IT</div><div><strong>Italie</strong></div></div>
+                <div style="font-weight:700">vs</div>
+                <div class="team"><div class="crest">NL</div><div><strong>Pays-Bas</strong></div></div>
+              </div>
+              <div class="meta">28 Mars 2026 — 20:00</div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <div class="odd">2.40</div>
+                <div class="odd">3.10</div>
+                <div class="odd">2.80</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="matches" id="matches">
+            <h3 style="margin:6px 0 12px 0">Tous les matchs</h3>
+
+            <!-- Matches list (national teams only) -->
+            <!-- Each match row has data attributes used by JS -->
+            <div class="match-row" data-id="m1" data-home="France" data-away="Brésil" data-odds="1.85,3.20,4.10" data-date="2025-10-12T21:00:00">
+              <div class="match-info">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="crest">FR</div>
+                  <div>
+                    <div><strong>France</strong> <span style="color:var(--muted)">vs</span> <strong>Brésil</strong></div>
+                    <div class="meta">12 Oct 2025 - 21:00</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="odds">
+                  <div class="odd" data-odd="1.85">1.85</div>
+                  <div class="odd" data-odd="3.20">3.20</div>
+                  <div class="odd" data-odd="4.10">4.10</div>
+                </div>
+                <button class="small-btn add-btn">Ajouter au ticket</button>
+              </div>
+            </div>
+
+            <div class="match-row" data-id="m2" data-home="Argentine" data-away="Portugal" data-odds="2.10,3.00,3.50" data-date="2025-11-20T18:45:00">
+              <div class="match-info">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="crest">AR</div>
+                  <div>
+                    <div><strong>Argentine</strong> <span style="color:var(--muted)">vs</span> <strong>Portugal</strong></div>
+                    <div class="meta">20 Nov 2025 - 18:45</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="odds">
+                  <div class="odd" data-odd="2.10">2.10</div>
+                  <div class="odd" data-odd="3.00">3.00</div>
+                  <div class="odd" data-odd="3.50">3.50</div>
+                </div>
+                <button class="small-btn add-btn">Ajouter au ticket</button>
+              </div>
+            </div>
+
+            <div class="match-row" data-id="m3" data-home="Espagne" data-away="Allemagne" data-odds="1.95,3.40,4.00" data-date="2025-12-05T17:30:00">
+              <div class="match-info">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="crest">ES</div>
+                  <div>
+                    <div><strong>Espagne</strong> <span style="color:var(--muted)">vs</span> <strong>Allemagne</strong></div>
+                    <div class="meta">05 Déc 2025 - 17:30</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="odds">
+                  <div class="odd" data-odd="1.95">1.95</div>
+                  <div class="odd" data-odd="3.40">3.40</div>
+                  <div class="odd" data-odd="4.00">4.00</div>
+                </div>
+                <button class="small-btn add-btn">Ajouter au ticket</button>
+              </div>
+            </div>
+
+            <div class="match-row" data-id="m4" data-home="Italie" data-away="Pays-Bas" data-odds="2.40,3.10,2.80" data-date="2026-03-28T20:00:00">
+              <div class="match-info">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="crest">IT</div>
+                  <div>
+                    <div><strong>Italie</strong> <span style="color:var(--muted)">vs</span> <strong>Pays-Bas</strong></div>
+                    <div class="meta">28 Mars 2026 - 20:00</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="odds">
+                  <div class="odd" data-odd="2.40">2.40</div>
+                  <div class="odd" data-odd="3.10">3.10</div>
+                  <div class="odd" data-odd="2.80">2.80</div>
+                </div>
+                <button class="small-btn add-btn">Ajouter au ticket</button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="account">
+          <h4>Mon compte</h4>
+          <div class="balance">
+            <div>
+              <div style="color:var(--muted);font-size:13px">Solde virtuel</div>
+              <div style="font-size:20px;font-weight:700"> <span id="balance">1000</span> crédits</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="small-btn" id="recharge">Recharger en crédits fictifs</button>
+              <button class="small-btn" id="history-btn">Historique des paris</button>
+            </div>
+          </div>
+          <div id="history" style="margin-top:12px;display:none"></div>
+        </section>
+
+      </div>
+
+      <aside class="ticket" id="ticket">
+        <h3>Ticket de pari</h3>
+        <div id="selections">
+          <div style="color:var(--muted);font-size:13px">Aucune sélection</div>
+        </div>
+
+        <div class="stake">
+          <label for="stake">Mise (crédits)</label>
+          <input type="number" id="stake" min="1" value="10">
+        </div>
+        <div style="margin-top:8px">Gain potentiel : <span class="potential" id="potential">0</span> crédits</div>
+
+        <button class="btn" id="place-bet" style="margin-top:12px">Placer le pari</button>
+
+        <div class="warning">Transactions factices uniquement – aucun argent réel.</div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // Simple front-end logic for selecting odds, calculating potential, and fake account history
+    const selections = [];
+    const selectionsEl = document.getElementById('selections');
+    const potentialEl = document.getElementById('potential');
+    const stakeInput = document.getElementById('stake');
+    const balanceEl = document.getElementById('balance');
+    const historyEl = document.getElementById('history');
+    let balance = 1000;
+    let history = [];
+
+    function renderSelections(){
+      selectionsEl.innerHTML = '';
+      if(selections.length===0){
+        selectionsEl.innerHTML = '<div style="color:var(--muted);font-size:13px">Aucune sélection</div>';
+        potentialEl.textContent = '0';
+        return;
+      }
+      selections.forEach((s, idx)=>{
+        const div = document.createElement('div');
+        div.className='selection';
+        div.innerHTML = `<div style=\"min-width:0\"><div style=\"font-size:14px\"><strong>${s.home}</strong> vs <strong>${s.away}</strong></div><div class=\"meta\">Cote choisie: ${s.odd}</div></div><div style=\"display:flex;flex-direction:column;align-items:flex-end\"><button class=\"small-btn\" data-idx=\"${idx}\">Supprimer</button></div>`;
+        selectionsEl.appendChild(div);
+      });
+      updatePotential();
+    }
+
+    function updatePotential(){
+      const stake = Number(stakeInput.value) || 0;
+      // multiply odds if multiple selections (paris combinés)
+      const combined = selections.reduce((acc,s)=>acc * Number(s.odd), 1);
+      const pot = (stake * combined).toFixed(2);
+      potentialEl.textContent = pot;
+    }
+
+    // Add event listeners to add buttons
+    document.querySelectorAll('.add-btn').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const row = e.target.closest('.match-row');
+        const id = row.dataset.id;
+        const home = row.dataset.home;
+        const away = row.dataset.away;
+        // By default pick first odd
+        const odds = row.dataset.odds.split(',');
+        const odd = odds[0];
+        // prevent duplicates (same match)
+        if(selections.some(s=>s.id===id)){
+          alert('Match déjà dans le ticket');
+          return;
+        }
+        selections.push({id,home,away,odd});
+        renderSelections();
+      })
+    })
+
+    // Delegate delete
+    selectionsEl.addEventListener('click', e=>{
+      if(e.target.matches('button')){
+        const idx = Number(e.target.dataset.idx);
+        if(!isNaN(idx)){
+          selections.splice(idx,1);
+          renderSelections();
+        }
+      }
+    })
+
+    // Clicking on single odds to choose specific odd and add
+    document.querySelectorAll('.odd').forEach(el=>{
+      el.addEventListener('click', e=>{
+        const odd = e.target.dataset.odd || e.target.textContent;
+        const row = e.target.closest('.match-row');
+        const id = row.dataset.id;
+        const home = row.dataset.home;
+        const away = row.dataset.away;
+        if(selections.some(s=>s.id===id)){
+          alert('Match déjà dans le ticket — supprimez-le d\'abord pour changer la cote.');
+          return;
+        }
+        selections.push({id,home,away,odd});
+        renderSelections();
+      })
+    })
+
+    stakeInput.addEventListener('input', updatePotential);
+
+    document.getElementById('place-bet').addEventListener('click', ()=>{
+      const stake = Number(stakeInput.value) || 0;
+      if(selections.length===0){alert('Aucune sélection dans le ticket.');return}
+      if(stake<=0){alert('Entrez une mise valide.');return}
+      if(stake>balance){alert('Solde insuffisant. Rechargez vos crédits fictifs.');return}
+      const pot = Number(potentialEl.textContent) || 0;
+      // Fake placement
+      balance -= stake;
+      balanceEl.textContent = balance;
+      const record = {date: new Date().toLocaleString(), selections: JSON.parse(JSON.stringify(selections)), stake, potential: pot};
+      history.unshift(record);
+      alert('Pari placé (fictif). Gain potentiel: ' + pot + ' crédits.');
+      // clear
+      selections.length=0;
+      renderSelections();
+    })
+
+    document.getElementById('recharge').addEventListener('click', () => {
+      let solde = localStorage.getItem('userBalance') !== null 
+          ? Number(localStorage.getItem('userBalance')) 
+          : 1000;
+
+      solde += 500; // Ajoute 500 crédits
+      localStorage.setItem('userBalance', solde); // Met à jour le localStorage
+
+      const balanceEl = document.getElementById('balance');
+      if (balanceEl) {
+          balanceEl.textContent = solde; // Met à jour l'affichage
+      }
+
+      alert("500 crédits fictifs ajoutés !");
+    });
+
+    document.getElementById('history-btn').addEventListener('click', ()=>{
+      if(historyEl.style.display === 'none'){
+        historyEl.style.display = 'block';
+        renderHistory();
+      } else {
+        historyEl.style.display = 'none';
+      }
+    })
+
+    function renderHistory(){
+      if(history.length===0){
+        historyEl.innerHTML = '<div style="color:var(--muted);font-size:13px">Aucun pari effectué</div>';
+        return;
+      }
+      historyEl.innerHTML = history.map(h=>{
+        const sel = h.selections.map(s=>`${s.home} vs ${s.away} (${s.odd})`).join('<br>');
+        return `<div style=\"padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)\"><div style=\"font-size:13px;color:var(--muted)\">${h.date}</div><div style=\"font-weight:700\">Mise: ${h.stake} crédits — Potentiel: ${h.potential} crédits</div><div style=\"font-size:13px;margin-top:6px\">${sel}</div></div>`
+      }).join('');
+    }
+
+    // Quick bet scroll
+    document.getElementById('quick-bet').addEventListener('click', ()=>{
+      window.scrollTo({top:document.getElementById('matches').offsetTop - 50,behavior:'smooth'})
+    })
+
+    // See odds toggle highlight
+    document.getElementById('see-odds').addEventListener('click', ()=>{
+      document.querySelectorAll('.odd').forEach(o=>o.style.transform='scale(1.02)');
+      setTimeout(()=>document.querySelectorAll('.odd').forEach(o=>o.style.transform='none'),400)
+    })
+
+    // Initialize
+    renderSelections();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const balanceEl = document.getElementById('balance'); // ID de l'élément affichant le solde
+      const storedBalance = localStorage.getItem('userBalance');
+      if (storedBalance !== null) {
+          balanceEl.textContent = storedBalance;
+      }
+    });
+    
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'userBalance') {
+          const balanceEl = document.getElementById('balance');
+          if (balanceEl) {
+              balanceEl.textContent = event.newValue;
+          }
+      }
+    });
+  </script>
+</body>
+</html>
+```

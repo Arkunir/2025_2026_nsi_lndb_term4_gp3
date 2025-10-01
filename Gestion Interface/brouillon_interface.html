@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproduction Betclic – Version Foot</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; margin:0; background:#f4f4f4; color:#222; }
+    header { background:#E30613; color:#fff; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { font-size:20px; margin:0; }
+    nav a { color:#fff; margin:0 10px; text-decoration:none; font-weight:bold; cursor:pointer; }
+    nav a.active { border-bottom:2px solid #fff; }
+    .page { display:none; padding:20px; }
+    .page.active { display:block; }
+    .match { background:#fff; margin:10px 0; padding:15px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; }
+    .match button { background:#E30613; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #ticket, #account { background:#fff; padding:15px; border-radius:10px; margin-top:20px; }
+    #ticket button, #account button { background:#E30613; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer; width:100%; margin-top:10px; }
+    .gain { color:green; font-weight:bold; }
+    .warning { font-size:12px; color:#666; margin-top:20px; text-align:center; }
+    @media(max-width:768px){
+      header { flex-direction:column; align-items:flex-start; }
+      nav { margin-top:10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Betclic – Foot (fictif)</h1>
+    <nav>
+      <a id="nav-home" class="active">Accueil</a>
+      <a id="nav-ticket">Mon Ticket</a>
+      <a id="nav-account">Mon Compte</a>
+    </nav>
+  </header>
+
+  <!-- Accueil -->
+  <div id="home" class="page active">
+    <h2>Prochains matchs</h2>
+    <div class="match">
+      <div>France vs Espagne</div>
+      <div>
+        <button onclick="addToTicket('France', 1.80)">France 1.80</button>
+        <button onclick="addToTicket('Espagne', 2.10)">Espagne 2.10</button>
+        <button onclick="addToTicket('Nul', 3.00)">Nul 3.00</button>
+      </div>
+    </div>
+    <div class="match">
+      <div>Brésil vs Allemagne</div>
+      <div>
+        <button onclick="addToTicket('Brésil', 1.90)">Brésil 1.90</button>
+        <button onclick="addToTicket('Allemagne', 2.00)">Allemagne 2.00</button>
+        <button onclick="addToTicket('Nul', 3.10)">Nul 3.10</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket -->
+  <div id="ticket-page" class="page">
+    <h2>Mon Ticket</h2>
+    <div id="ticket"></div>
+    <input type="number" id="mise" placeholder="Mise (€ fictifs)" oninput="updateGain()">
+    <div id="gain" class="gain"></div>
+    <button onclick="placerPari()">Placer le pari</button>
+  </div>
+
+  <!-- Compte -->
+  <div id="account-page" class="page">
+    <h2>Mon Compte</h2>
+    <div id="account">
+      <p>Solde : <span id="solde">1000</span> € fictifs</p>
+      <h3>Historique</h3>
+      <ul id="historique"></ul>
+      <button onclick="recharger()">Recharger 500 € fictifs</button>
+    </div>
+  </div>
+
+  <div class="warning">⚠️ Ce site est une reproduction fictive – aucun argent réel n’est utilisé.</div>
+
+  <script>
+    let ticket = [];
+    let solde = 1000;
+
+    function addToTicket(selection, cote){
+      ticket.push({selection, cote});
+      renderTicket();
+      showPage('ticket');
+    }
+
+    function renderTicket(){
+      const container = document.getElementById('ticket');
+      container.innerHTML = '';
+      ticket.forEach((t, i)=>{
+        const div = document.createElement('div');
+        div.textContent = `${t.selection} @ ${t.cote}`;
+        container.appendChild(div);
+      });
+      updateGain();
+    }
+
+    function updateGain(){
+      let mise = document.getElementById('mise').value;
+      if(!mise) mise=0;
+      let totalCote = ticket.reduce((acc, t)=> acc * t.cote, 1);
+      let gain = (mise * totalCote).toFixed(2);
+      document.getElementById('gain').textContent = mise>0 ? `Gain potentiel : ${gain} € fictifs` : '';
+    }
+
+    function placerPari(){
+      let mise = parseFloat(document.getElementById('mise').value);
+      if(isNaN(mise) || mise<=0){ alert('Entrez une mise'); return; }
+      if(mise > solde){ alert('Solde insuffisant'); return; }
+      let totalCote = ticket.reduce((acc, t)=> acc * t.cote, 1);
+      let gain = (mise * totalCote).toFixed(2);
+      solde -= mise;
+      document.getElementById('solde').textContent = solde;
+      const li = document.createElement('li');
+      li.textContent = `Pari: ${ticket.map(t=>t.selection).join(', ')} | Mise ${mise} | Gain potentiel ${gain}`;
+      document.getElementById('historique').appendChild(li);
+      ticket = [];
+      renderTicket();
+      document.getElementById('mise').value='';
+      document.getElementById('gain').textContent='';
+      alert('Pari placé (fictif) !');
+    }
+
+    function recharger(){
+      solde += 500;
+      document.getElementById('solde').textContent = solde;
+    }
+
+    function showPage(page){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById(page==='home' ? 'home' : page+'-page').classList.add('active');
+      document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+      document.getElementById('nav-'+page).classList.add('active');
+    }
+
+    document.getElementById('nav-home').onclick = ()=> showPage('home');
+    document.getElementById('nav-ticket').onclick = ()=> showPage('ticket');
+    document.getElementById('nav-account').onclick = ()=> showPage('account');
+  </script>
+</body>
+</html>
