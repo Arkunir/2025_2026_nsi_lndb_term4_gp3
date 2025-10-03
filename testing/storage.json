@@ -1,0 +1,36 @@
+{
+  "balance": 1500,
+  "history": [
+    {
+      "date": "18/09/2025 08:56:16",
+      "selections": [
+        {
+          "id": "m1",
+          "home": "France",
+          "away": "Brésil",
+          "odd": "4.1"
+        },
+        {
+          "id": "m2",
+          "home": "Argentine",
+          "away": "Portugal",
+          "odd": "3.5"
+        },
+        {
+          "id": "m3",
+          "home": "Espagne",
+          "away": "Allemagne",
+          "odd": "1.95"
+        },
+        {
+          "id": "m4",
+          "home": "Italie",
+          "away": "Pays-Bas",
+          "odd": "3.1"
+        }
+      ],
+      "stake": 1000.0,
+      "potential": 86745.75
+    }
+  ]
+}
