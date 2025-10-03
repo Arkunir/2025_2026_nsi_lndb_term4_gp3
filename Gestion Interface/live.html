@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Matchs en direct - BetFoot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:#E30613;
+      --dark:#121212;
+      --muted:#6b6b6b;
+      --bg:#0f1113;
+      --card:#151617;
+      --white:#ffffff;
+      --gain:#1db954;
+      --glass: rgba(255,255,255,0.03);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#071014);color:var(--white);min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:transparent}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700}
+    nav{display:flex;gap:18px;align-items:center}
+    nav a{color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600}
+
+    .container{max-width:1200px;margin:18px auto;padding:0 18px}
+    h2{margin:0 0 12px 0}
+    .matches{background:var(--card);padding:12px;border-radius:12px}
+    .match-row{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .match-row:last-child{border-bottom:none}
+    .match-info{display:flex;align-items:center;gap:12px;min-width:260px}
+    .meta{font-size:13px;color:var(--muted)}
+    .score{font-weight:700;font-size:18px}
+  </style>
+</head>
+<body>
+  <!-- En-tête identique -->
+  <header>
+    <div class="brand container" style="max-width:1200px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="logo">BF</div>
+        <div>
+          <div style="font-weight:700">BetFoot</div>
+          <div style="font-size:12px;color:var(--muted)">Reproduction Betclic — Version Foot</div>
+        </div>
+      </div>
+      <nav>
+        <a href="interface.html">Accueil</a>
+        <a href="live.html">Matchs en direct</a>
+        <a href="paris.html">Paris</a>
+        <a href="resultats.html">Résultats</a>
+        <a href="compte.html">Mon compte</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="container">
+    <h2>Matchs en direct (équipes nationales)</h2>
+    <div class="matches" id="live-matches">
+      <div style="color:var(--muted)">Chargement des matchs...</div>
+    </div>
+  </main>
+
+  <script>
+    const API_KEY = "b84523bcffd8ea3228f055395d0ffada"; // <-- Mets ta clé API-Football ici
+    const API_URL = " https://v3.football.api-sports.io";
+
+    async function fetchLiveMatches() {
+      try {
+        const res = await fetch(API_URL, {
+          headers: {
+            "x-apisports-key": API_KEY
+          }
+        });
+        const data = await res.json();
+
+        const container = document.getElementById("live-matches");
+        container.innerHTML = "";
+
+        if (!data.response || data.response.length === 0) {
+          container.innerHTML = "<div style='color:var(--muted)'>Aucun match en direct</div>";
+          return;
+        }
+
+        // Filtrer uniquement les matchs internationaux
+        const nationalMatches = data.response.filter(m => {
+          return m.league.type === "International";
+        });
+
+        if (nationalMatches.length === 0) {
+          container.innerHTML = "<div style='color:var(--muted)'>Aucun match national en direct</div>";
+          return;
+        }
+
+        // Affichage
+        nationalMatches.forEach(match => {
+          const row = document.createElement("div");
+          row.className = "match-row";
+
+          const home = match.teams.home.name;
+          const away = match.teams.away.name;
+          const scoreHome = match.goals.home ?? 0;
+          const scoreAway = match.goals.away ?? 0;
+          const minute = match.fixture.status.elapsed || 0;
+
+          row.innerHTML = `
+            <div class="match-info">
+              <div>
+                <div><strong>${home}</strong> vs <strong>${away}</strong></div>
+                <div class="meta">Minute ${minute}'</div>
+              </div>
+            </div>
+            <div class="score">${scoreHome} - ${scoreAway}</div>
+          `;
+          container.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error("Erreur API :", err);
+        document.getElementById("live-matches").innerHTML = "<div style='color:red'>Erreur lors du chargement</div>";
+      }
+    }
+
+    // Charger au démarrage
+    fetchLiveMatches();
+
+    // Rafraîchir toutes les 30 secondes
+    setInterval(fetchLiveMatches, 30000);
+  </script>
+</body>
+</html>
