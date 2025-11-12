@@ -8,8 +8,8 @@ import numpy as np
 
 # Charger les datasets
 print("Chargement des données...")
-results_df = pd.read_csv('results.csv')
-fifa_ranking_df = pd.read_csv('fifa_ranking.csv')
+results_df = pd.read_csv('True_Version/results.csv')
+fifa_ranking_df = pd.read_csv('True_Version/fifa_ranking.csv')
 
 # Standardiser les noms des colonnes et des pays pour la fusion
 # On garde 'rank_date' et 'country_full' du classement FIFA
