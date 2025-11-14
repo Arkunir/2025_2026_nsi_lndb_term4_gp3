@@ -79,6 +79,16 @@ results_df['is_neutral'] = results_df['neutral'].astype(int)
 
 # --- 3. Préparation pour l'Architecture en Deux Étapes ---
 
+# CORRECTION : Ajout de la création de la colonne 'result' qui manquait !
+def get_match_result(row):
+    if row['home_score'] > row['away_score']: return 1
+    if row['home_score'] < row['away_score']: return 2
+    return 0
+
+print("Création de la colonne 'result'...")
+results_df['result'] = results_df.apply(get_match_result, axis=1)
+
+
 # Définir les features et les cibles
 features = [
     'home_team_rank', 'away_team_rank', 'home_team_form', 'away_team_form',
