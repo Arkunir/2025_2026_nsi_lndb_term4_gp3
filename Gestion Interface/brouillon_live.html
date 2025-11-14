@@ -72,15 +72,12 @@
       margin:0 0 12px 0;
     }
 
-  .widget-box {
-    background: transparent; /* comme avant */
-    padding: 0;
-    margin-top: 0; /* supprime l’espace inutile au-dessus */
-    display: flex;
-    justify-content: flex-start; /* ou center si tu veux centré */
-    flex-direction: column;
-  }
-
+    .widget-box{
+      background:var(--card);
+      border-radius:12px;
+      padding:16px;
+      box-shadow:0 0 20px rgba(0,0,0,0.25);
+    }
 
     api-sports-widget{
       display:block;
@@ -130,17 +127,15 @@
         data-type="config"
         data-refresh="120"
         data-sport="football"
-        data-key="b84523bcffd8ea3228f055395d0ffada"  >
+        data-key="b84523bcffd8ea3228f055395d0ffada"  <!-- ta clé API ici -->
       </api-sports-widget>
 
       <!-- ⚽ Le widget Live Scores -->
       <api-sports-widget
-        data-refresh="120"
-        data-sport="football"
-        data-key="b84523bcffd8ea3228f055395d0ffada" 
         data-type="games"
         data-lang="fr"
         data-theme="dark"
+        data-league="4,5,6,9,10,490,587,38,493,921,36,19,538,973,7,532,965,1012,22,536,804,806,490,587,38,493,921,538,973,532,965,1012,1122"
         data-show-logos="true"
         data-show-error="false"
         data-tab="live"
