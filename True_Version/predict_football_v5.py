@@ -98,7 +98,8 @@ final_df = results_df[features + ['goal_diff', 'result']].dropna()
 X = final_df[features]
 y_reg = final_df['goal_diff'] # Cible de régression
 
-X_train, X_test, y_reg_train, y_reg_test, y_result_test = train_test_split(
+# CORRECTION : Ajout de la variable manquante y_result_train
+X_train, X_test, y_reg_train, y_reg_test, y_result_train, y_result_test = train_test_split(
     X, y_reg, final_df['result'], test_size=0.2, random_state=42, stratify=final_df['result']
 )
 
