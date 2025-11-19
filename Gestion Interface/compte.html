@@ -1,345 +1,564 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Reproduction Betclic – Version Foot (transactions fictives)</title>
+    <title>Mon Compte - BetFoot</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin:0;
-      background:#070707;
-      color: #fff;
-    }
-
-    :root{
-      --red:#E30613;
-      --dark:#121212;
-      --muted:#6b6b6b;
-      --bg:#0f1113;
-      --card:#151617;
-      --white:#ffffff;
-      --gain:#1db954;
-      --glass: rgba(255,255,255,0.03);
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,var(--bg),#071014);color:var(--white);min-height:100vh}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:transparent}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:46px;height:46px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700}
-    nav{display:flex;gap:18px;align-items:center}
-    nav a{color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600}
-
-    .container{max-width:1200px;margin:18px auto;padding:0 18px}
-    .top{display:flex;gap:18px;align-items:flex-start}
-
-    h1 {
-      margin-bottom:10px;
-      color:#fff;
-    }
-
-    .solde {
-      font-size:18px;
-      padding:15px;
-      background:#222;
-      border-radius:8px;
-      margin-bottom:20px;
-    }
-
-    button {
-      background:#E30613;
-      color:#fff;
-      border:none;
-      padding:10px 20px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-      transition:0.3s;
-    }
-
-    button:hover {
-      background:#ff3b3b;
-    }
-
-    table {
-      width:100%;
-      border-collapse: collapse;
-      margin-top:20px;
-    }
-
-    th, td {
-      padding:10px;
-      border-bottom:1px solid #333;
-      text-align:left;
-    }
-
-    th {
-      background:#E30613;
-      color:#fff;
-    }
-
-    td.gain {
-      color: #00ff00; /* vert pour gains */
-      font-weight:bold;
-    }
-
-  </style>
+    
+    <style>
+        /* Variables et styles partagés (pour la cohérence) */
+        :root{
+            --red:#E30613;
+            --dark:#121212;
+            --muted:#6b6b6b;
+            --bg:#0f1113;
+            --card:#151617;
+            --white:#ffffff;
+            --gain:#1db954;
+            --loss:#ff3b3b;
+            --glass: rgba(255,255,255,0.03);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            background:linear-gradient(180deg,var(--bg),#071014);
+            color:var(--white);
+            min-height:100vh;
+        }
+        
+        /* Style du header et de la navigation */
+        header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:18px 24px;
+        }
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+        .logo{
+            width:30px;
+            height:30px;
+            border-radius:4px;
+            background:var(--red);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:700;
+            font-size:14px;
+        }
+        nav{
+            display:flex;
+            gap:20px;
+        }
+        nav a{
+            color:var(--white);
+            text-decoration:none;
+            padding:6px 0;
+            position:relative;
+        }
+        nav a:hover{
+            color:var(--red);
+        }
+        /* Style pour le lien 'Mon compte' actif */
+        nav a[href="compte.html"]::after { 
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 2px;
+            background: var(--red);
+        }
+        
+        /* Styles de mise en page */
+        .container{
+            max-width:800px;
+            margin:20px auto;
+            padding:0 24px;
+        }
+        .card{
+            background:var(--card);
+            padding:20px;
+            border-radius:8px;
+            margin-bottom:20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .button{
+            background-color: var(--red);
+            color: var(--white);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .button:hover{
+            background-color: #c90510;
+        }
+        .remove-btn{
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
-
-  <header>
-    <div class="brand container" style="max-width:1200px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="logo">BF</div>
-        <div>
-          <div style="font-weight:700">BetFoot</div>
-          <div style="font-size:12px;color:var(--muted)">Reproduction Betclic — Version Foot</div>
+    
+    <header>
+        <div class="brand">
+            <div class="logo">BF</div>
+            <div>
+                <div style="font-weight:700">BetFoot</div>
+                <div style="font-size:12px;color:var(--muted)">Reproduction Betclic — Version Foot</div>
+            </div>
         </div>
-      </div>
-      <nav>
-        <a href="interface.html">Accueil</a>
-        <a href="live.html">Matchs en direct</a>
-        <a href="paris.html">Paris</a>
-        <a href="resultats.html">Résultats</a>
-        <a href="compte.html">Mon compte</a>
-      </nav>
-    </div>
-  </header>
-  
+        <nav>
+            <a href="interface.html">Accueil</a>
+            <a href="live.html">Matchs en direct</a>
+            <a href="paris.html">Paris</a>
+            <a href="resultats.html">Résultats</a>
+            <a href="compte.html">Mon compte</a>
+        </nav>
+    </header>
 
-<div class="container">
-  <h1>Espace Mon compte</h1>
-  <div class="solde">Solde fictif : <span id="solde">1000</span> crédits</div>
-  <button onclick="recharger()">Recharger 500 crédits fictifs</button>
+    <main class="container">
+        <div class="card">
+            <h2 style="margin-top:0">Mon Compte</h2>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px">
+                <div style="font-size:18px;font-weight:600">Solde actuel: <span id="userBalanceDisplay">100</span> crédits</div>
+                <button class="button" onclick="addFunds(10)">+ 10 Crédits</button>
+            </div>
+            
+            <h3 style="border-bottom:1px solid var(--glass);padding-bottom:10px; margin-top:30px">Historique des transactions</h3>
+            <div id="transactionHistory">
+                </div>
+        </div>
 
-  <h2>Historique des paris</h2>
-  <table id="historique">
-    <tr>
-      <th>Match</th>
-      <th>Mise</th>
-      <th>Gain potentiel</th>
-    </tr>
-    <!-- Exemple de ligne -->
-    <tr>
-      <td>France vs Espagne</td>
-      <td>100</td>
-      <td class="gain">185</td>
-    </tr>
-    <tr>
-      <td>Brésil vs Allemagne</td>
-      <td>50</td>
-      <td class="gain">95</td>
-    </tr>
-  </table>
-</div>
+        <div class="card" style="margin-top:30px; border-left:4px solid var(--red)">
+            <h2 style="margin-top:0; color:var(--red)">Panneau d'Administration</h2>
 
-<script>
-  let solde = localStorage.getItem('userBalance') !== null 
-    ? Number(localStorage.getItem('userBalance')) 
-    : 1000;
+            <div id="adminBox">
+                <p>Connectez-vous pour accéder aux outils d'administration.</p>
+                <form id="adminLoginForm">
+                    <input type="text" id="adminUsername" placeholder="Identifiant" style="padding:8px; border:1px solid #333; background:var(--dark); color:white; border-radius:4px; margin-right:10px;">
+                    <input type="password" id="adminPassword" placeholder="Mot de passe" style="padding:8px; border:1px solid #333; background:var(--dark); color:white; border-radius:4px; margin-right:10px;">
+                    <button class="button" type="submit">Connexion</button>
+                </form>
+                <p id="adminMessage" style="margin-top:10px; font-size:12px"></p>
+            </div>
 
-    function recharger() {
-    solde += 500;
-    document.getElementById('solde').textContent = solde;
+            <div id="adminPanel" style="display:none; padding-top:15px">
+                <p style="color:var(--gain)">Connecté en tant qu'Administrateur.</p>
 
-    // Mettre à jour le solde dans localStorage
-    localStorage.setItem('userBalance', solde);
+                <h3 style="border-bottom:1px solid var(--glass);padding-bottom:10px;">Outils de Solde</h3>
+                <div style="display:flex; gap:15px; margin-bottom:20px;">
+                    <button class="button" onclick="resetBalance()">Réinitialiser le Solde Utilisateur</button>
+                    <button class="remove-btn" onclick="logoutAdmin()" style="background-color:#555">Déconnexion Admin</button>
+                </div>
 
-    alert("500 crédits fictifs ajoutés !");
-}
-</script>
+                <h3 style="border-bottom:1px solid var(--glass);padding-bottom:10px; margin-top:30px">Saisie des Scores Officiels</h3>
+                <div id="scoreEntryPanel">
+                    </div>
+                
+                <h3 style="border-bottom:1px solid var(--glass);padding-bottom:10px; margin-top:30px">Gestion des Paris (Suppression)</h3>
+                <div id="adminHistory">
+                    </div>
+            </div>
+        </div>
 
-<!-- Encadré Admin / Panneau Admin -->
-<div class="admin-box" id="adminBox">
-    <h2>Espace Administrateur</h2>
-    <form id="adminForm">
-      <label for="adminUser">Identifiant :</label>
-      <input type="text" id="adminUser" placeholder=" " required>
-      
-      <label for="adminPass">Mot de passe :</label>
-      <input type="password" id="adminPass" placeholder=" " required>
-      
-      <button type="submit">Se connecter</button>
-    </form>
-    <div id="adminMessage" style="margin-top:10px;color:#ff3b3b"></div>
-  </div>
-  
-  <div class="admin-panel" id="adminPanel" style="display:none;">
-    <h2>Tableau de bord Admin</h2>
+    </main>
     
-    <!-- Modifier le solde -->
-    <div style="margin-bottom:15px;">
-      <label for="adminBalance">Modifier le solde :</label>
-      <input type="number" id="adminBalance" min="0">
-      <button onclick="updateBalance()">Mettre à jour</button>
-    </div>
+    <script>
+        // Variables globales (stockées dans localStorage)
+        let balance = 100;
+        let bets = []; // L'historique des mises (betHistory)
+        let preds = []; // L'historique des tickets/prédictions (predictions)
+        
+        // --- Fonctions Utilitaires ---
 
-    <!-- Saisie des scores officiels -->
-    <div style="margin-bottom:15px;">
-      <label for="matchSelect">Sélectionner le match :</label>
-      <select id="matchSelect">
-        <option value="m1">France vs Brésil</option>
-        <option value="m2">Argentine vs Portugal</option>
-        <option value="m3">Espagne vs Allemagne</option>
-        <option value="m4">Italie vs Pays-Bas</option>
-      </select>
-    </div>
-    <div style="margin-bottom:15px;">
-      <label for="finalScore">Score officiel :</label>
-      <input type="text" id="finalScore" placeholder="ex: 2-1">
-      <button onclick="setFinalScore()">Enregistrer score</button>
-    </div>
-    
-    <!-- Historique des paris -->
-    <div style="margin-bottom:15px;">
-      <h3>Historique des paris</h3>
-      <div id="adminHistory"></div>
-    </div>
-    
-    <button onclick="logoutAdmin()" style="background:#b0050f; color:#fff; padding:5px 10px; border:none; border-radius:5px;">Se déconnecter</button>
-  </div>
-  
-  <style>
-  .admin-box, .admin-panel {
-    background-color: #1a1a1a;
-    color: #fff;
-    border: 2px solid #E30613;
-    padding: 20px;
-    width: 400px;
-    margin: 30px auto;
-    border-radius: 10px;
-    text-align: center;
-  }
-  .admin-box input, .admin-panel input, .admin-panel select {
-    width: 70%;
-    padding: 5px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  .admin-box button, .admin-panel button {
-    background-color: #E30613;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .admin-box button:hover, .admin-panel button:hover {
-    background-color: #b0050f;
-  }
-  .admin-panel .remove-btn {
-    background: #ff3b3b;
-    margin-top:5px;
-  }
-  </style>
-  
-  <script>
-  // variable globale pour le solde
-  let balance = localStorage.getItem('userBalance') !== null 
-        ? Number(localStorage.getItem('userBalance')) 
-        : 1000; // Valeur par défaut si aucune donnée n'est sauvegardée
+        function getFormattedDate() {
+            return new Date().toLocaleString('fr-FR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Détermine le vainqueur (1=Home, 2=Away, N=Nul)
+        function getWinner(scoreH, scoreA) {
+            if (scoreH > scoreA) return 1;
+            if (scoreA > scoreH) return 2;
+            return 'N'; 
+        }
 
-  // objet pour stocker les scores officiels
-  const officialScores = JSON.parse(localStorage.getItem('officialScores') || '{}');
+        // Trouve la mise originale associée à un ticket (utile pour le paiement)
+        function findStake(ticketDate) {
+            const b = bets.find(x => x.date === ticketDate);
+            return b ? Number(b.stake) : null;
+        }
 
-  // Restaurer le solde depuis localStorage au chargement de la page
-  document.addEventListener('DOMContentLoaded', () => {
-      const balanceEl = document.getElementById('solde');
-      if (balanceEl) balanceEl.textContent = balance;
-  });
+        // --- Logique de Payout et Score ---
 
-  // Mettre à jour le solde
-  function updateBalance() {
-      const newBalance = Number(document.getElementById('adminBalance').value);
-      if (!isNaN(newBalance) && newBalance >= 0) {
-          balance = newBalance;
-          const balanceEl = document.getElementById('solde');
-          if (balanceEl) balanceEl.textContent = balance;
+        // Met à jour le statut d'un ticket après la saisie d'un score
+        function updateTicketStatus(ticket) {
+            const allMatchesScored = ticket.predictions.every(m => m.realHome !== undefined);
+            if (!allMatchesScored) return; // Ne rien faire si tous les matchs ne sont pas scorés
 
-          // Sauvegarder le solde dans localStorage
-          localStorage.setItem('userBalance', balance);
+            let ticketStatus = 'win';
+            let totalGain = ticket.potential; 
+            let hasRefundable = false;
 
-          alert("Solde mis à jour !");
-      } else {
-          alert("Entrez une valeur valide !");
-      }
-  }
+            // 1. Déterminer le statut de chaque match et le statut global du ticket
+            for (const match of ticket.predictions) {
+                if (match.realHome === undefined) continue; // Si non scoré, ignorer
 
-  // Enregistrer un score officiel
-  function setFinalScore() {
-      const matchId = document.getElementById('matchSelect').value;
-      const score = document.getElementById('finalScore').value.trim();
+                let matchStatus = '';
+                
+                if (match.realHome === match.predictedHome && match.realAway === match.predictedAway) {
+                    matchStatus = 'win'; // Score parfait
+                } else {
+                    const wPred = getWinner(match.predictedHome, match.predictedAway);
+                    const wReal = getWinner(match.realHome, match.realAway);
+                    
+                    if (wPred === wReal) {
+                        matchStatus = 'refund'; // Bon résultat (Gagnant/Nul/Perdant) mais mauvais score
+                        hasRefundable = true;
+                    } else {
+                        matchStatus = 'loss'; // Mauvaise prédiction du résultat
+                        ticketStatus = 'loss'; 
+                    }
+                }
+                match.status = matchStatus;
+            }
+            
+            // Si une défaite est trouvée, le ticket est perdant, on sort.
+            if (ticketStatus === 'loss') {
+                ticket.status = 'loss';
+                localStorage.setItem('predictions', JSON.stringify(preds));
+                renderAdminScoreEntry();
+                return; 
+            }
 
-      if(!score.match(/^\d+-\d+$/)) {
-          alert('Format invalide, exemple: 2-1');
-          return;
-      }
+            // Si le statut n'est pas 'loss', il est 'win' ou 'pending' (s'il y a des 'refund' et qu'il n'est pas encore payé)
+            if (hasRefundable) {
+                // Dans le cas d'un "remboursement/partiel" (refund), 
+                // on considère le ticket comme gagnant si c'était une prédiction à score exact qui a échoué.
+                // On garde 'win' pour payer le plein potentiel par simplification, 
+                // car le calcul de la cote partielle est trop complexe à intégrer ici.
+                ticketStatus = 'win';
+            }
 
-      officialScores[matchId] = score;
-      localStorage.setItem('officialScores', JSON.stringify(officialScores));
-      alert(`Score officiel de ${matchId} enregistré : ${score}`);
-  }
-  
-  // Connexion admin
-  document.getElementById('adminForm').addEventListener('submit', function(event){
-    event.preventDefault(); // empêche le rechargement
-    const user = document.getElementById('adminUser').value;
-    const pass = document.getElementById('adminPass').value;
-    const msg = document.getElementById('adminMessage');
 
-    if(user === "admin" && pass === "admin123"){
-      msg.style.color = "#00ff00";
-      msg.textContent = "Connexion réussie !";
-      document.getElementById('adminBox').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-      document.getElementById('adminBalance').value = balance;
-      renderAdminHistory();
-    } else {
-      msg.style.color = "#ff3b3b";
-      msg.textContent = "Identifiant ou mot de passe incorrect.";
-    }
-  });
-  
-  // Déconnexion
-  function logoutAdmin(){
-    document.getElementById('adminBox').style.display = 'block';
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('adminMessage').textContent = '';
-  }
+            // 2. Payer si TICKET GAGNANT et PAS ENCORE PAYÉ
+            if (ticketStatus === 'win' && !ticket._paid) {
+                balance += totalGain;
+                localStorage.setItem('userBalance', balance);
+                
+                // Ajouter une transaction de Gain
+                const transaction = {
+                    type: 'Gain',
+                    amount: totalGain,
+                    date: getFormattedDate(),
+                    ticket: ticket.date 
+                };
+                let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+                transactions.unshift(transaction);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                
+                ticket._paid = true; // Marquer comme payé
+                window.dispatchEvent(new Event('storage')); // Synchroniser le solde
+            }
+            
+            ticket.status = ticketStatus;
+            localStorage.setItem('predictions', JSON.stringify(preds));
+            
+            // Re-render pour voir le statut mis à jour
+            renderAdminScoreEntry();
+            renderTransactionHistory();
+        }
 
-  // Historique admin (avec suppression)
-  function renderAdminHistory(){
-    const container = document.getElementById('adminHistory');
-    if(history.length===0){
-      container.innerHTML = '<div style="color:#ccc">Aucun pari effectué</div>';
-      return;
-    }
-    container.innerHTML = history.map((h, idx)=>{
-      const sel = h.selections.map(s=>`${s.home} vs ${s.away} (${s.odd})`).join('<br>');
-      return `<div style="border-bottom:1px solid #333; padding:8px 0">
-                <div style="font-size:13px;color:#ccc">${h.date}</div>
-                <div>Mise: ${h.stake} crédits — Potentiel: ${h.potential} crédits</div>
-                <div style="font-size:13px; margin-top:4px">${sel}</div>
-                <button class="remove-btn" onclick="removeBet(${idx})">Supprimer ce pari</button>
-              </div>`;
-    }).join('');
-  }
+        function saveRealScore(tIndex, mIndex) {
+            const t = preds[tIndex];
+            const m = t.predictions[mIndex];
 
-  // Supprimer un pari
-  function removeBet(idx){
-    if(confirm("Supprimer ce pari ?")){
-      history.splice(idx,1);
-      renderAdminHistory();
-      renderHistory(); // mise à jour côté utilisateur
-    }
-  }
+            const rH = Number(document.getElementById(`realH_${tIndex}_${mIndex}`).value);
+            const rA = Number(document.getElementById(`realA_${tIndex}_${mIndex}`).value);
 
-  </script>
+            if (isNaN(rH) || isNaN(rA) || rH < 0 || rA < 0) {
+                alert("Entrez un score valide (chiffre positif ou zéro).");
+                return;
+            }
 
+            m.realHome = rH;
+            m.realAway = rA;
+            m.scored = true; 
+
+            // Lancer la vérification et le paiement pour le ticket entier
+            updateTicketStatus(t); 
+
+            alert(`Score (${rH}-${rA}) enregistré pour ${m.home} vs ${m.away}. Le ticket a été mis à jour.`);
+        }
+        
+        // --- Fonctions d'Affichage Admin ---
+
+        function renderAdminScoreEntry() {
+            const container = document.getElementById('scoreEntryPanel');
+            if (!container) return;
+            
+            // Afficher seulement les tickets qui ne sont pas encore payés
+            const pendingTickets = preds.filter(t => !t._paid); 
+
+            if (pendingTickets.length === 0) {
+                container.innerHTML = '<div style="color:var(--gain); font-weight:600">Tous les tickets ont été validés et payés.</div>';
+                return;
+            }
+
+            container.innerHTML = pendingTickets.map((t, tIndex) => {
+                // Trouver la mise et le potentiel du ticket
+                const originalBet = bets.find(b => b.date === t.date);
+                const stake = originalBet ? originalBet.stake : 'N/A';
+                const potential = originalBet ? originalBet.potential : 'N/A';
+                
+                const matchesHtml = t.predictions.map((m, mIndex) => {
+                    const isScored = m.scored || (m.realHome !== undefined && m.realAway !== undefined);
+                    
+                    let scoreInput = '';
+                    if (t.status === 'loss' || t._paid) {
+                        // Afficher le score final si le ticket est déjà résolu (perdu ou payé)
+                        scoreInput = `Score Final: ${m.realHome || '?'} - ${m.realAway || '?'}`;
+                    } else {
+                         // Afficher les champs de saisie
+                        scoreInput = `
+                            <input type="number" id="realH_${tIndex}_${mIndex}" value="${m.realHome !== undefined ? m.realHome : ''}" min="0" max="99" style="width:40px; padding:5px; margin-right:5px; border:1px solid #333; background:var(--dark); color:white; border-radius:4px;">
+                            - 
+                            <input type="number" id="realA_${tIndex}_${mIndex}" value="${m.realAway !== undefined ? m.realAway : ''}" min="0" max="99" style="width:40px; padding:5px; margin-left:5px; border:1px solid #333; background:var(--dark); color:white; border-radius:4px;">
+                            <button class="button" onclick="saveRealScore(${tIndex}, ${mIndex})" style="margin-left:10px; padding:5px 10px; margin-top:0; font-size:12px">Valider Score</button>
+                          `;
+                    }
+                          
+                    const statusText = m.status === 'win' ? '✅ Score Exact' : (m.status === 'loss' ? '❌ Perdu' : (m.status === 'refund' ? '⚠️ Résultat Correct (Score Faux)' : '... En attente'));
+                    const statusColor = m.status === 'win' ? 'var(--gain)' : (m.status === 'loss' ? 'var(--red)' : 'orange');
+
+                    return `
+                        <div style="padding:8px 0; border-bottom:1px dashed var(--glass); margin-bottom:10px">
+                            <div style="font-size:14px; font-weight:600">${m.home} vs ${m.away}</div>
+                            <div style="font-size:12px; color:var(--muted)">Prédiction: ${m.predictedHome}-${m.predictedAway} @ ${m.odd}</div>
+                            
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px">
+                                <div style="font-size:12px; color:var(--muted)">Score Officiel:</div>
+                                <div>${scoreInput}</div>
+                            </div>
+                            ${isScored ? `<div style="font-size:12px; margin-top:4px; color:${statusColor}">Statut du match: ${statusText}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                const ticketStatusText = t.status === 'win' ? `✅ Ticket Gagnant (+${potential} crédits)` : (t.status === 'loss' ? '❌ Ticket Perdant' : '⏳ En attente');
+                const ticketStatusColor = t.status === 'win' ? 'var(--gain)' : (t.status === 'loss' ? 'var(--red)' : 'var(--white)');
+
+                return `
+                    <div class="card" style="border:1px solid var(--glass); margin-top:15px; background:var(--dark); padding:15px">
+                        <div style="font-size:16px; font-weight:700; margin-bottom:10px">Ticket du ${t.date}</div>
+                        <div style="font-size:13px; color:var(--muted); margin-bottom:10px">Mise: ${stake} — Potentiel: ${potential}</div>
+                        <div style="font-weight:600; color:${ticketStatusColor}; margin-bottom:15px">${ticketStatusText}</div>
+                        ${matchesHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Fonctions d'Administration et de Gestion du Compte (Admin/User) ---
+        
+        // Ajout de fonds (pour l'utilisateur)
+        function addFunds(amount) {
+            balance += amount;
+            localStorage.setItem('userBalance', balance);
+            
+            // Ajouter une transaction fictive
+            const newTransaction = {
+                type: 'Crédit',
+                amount: amount,
+                date: getFormattedDate()
+            };
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions.unshift(newTransaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            document.getElementById('userBalanceDisplay').textContent = balance;
+            renderTransactionHistory();
+            
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Afficher l'historique des transactions utilisateur
+        function renderTransactionHistory() {
+            const container = document.getElementById('transactionHistory');
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            
+            if(transactions.length === 0) {
+                container.innerHTML = '<div style="color:var(--muted);font-size:13px">Aucune transaction enregistrée.</div>';
+                return;
+            }
+
+            container.innerHTML = transactions.map(t => {
+                let amountDisplay = `+ ${t.amount} crédits`;
+                let color = 'var(--gain)';
+                if (t.type === 'Gain') {
+                    amountDisplay = `+ ${t.amount} crédits`;
+                    color = 'var(--gain)';
+                } else if (t.type === 'Crédit') {
+                    amountDisplay = `+ ${t.amount} crédits`;
+                    color = 'var(--white)';
+                } else if (t.type === 'Pari') {
+                    amountDisplay = `- ${t.amount} crédits`;
+                    color = 'var(--loss)';
+                } else if (t.type === 'Réinitialisation') {
+                    amountDisplay = t.amount;
+                    color = 'orange';
+                }
+
+                return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--glass)">
+                            <div style="font-size:13px;color:var(--muted)">${t.date}</div>
+                            <div>${t.type}</div>
+                            <div style="font-weight:700; color:${color}">${amountDisplay}</div>
+                        </div>`;
+            }).join('');
+        }
+        
+        // Connexion Admin
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminUsername').value;
+            const pass = document.getElementById('adminPassword').value;
+            const msg = document.getElementById('adminMessage');
+
+            // Identifiants factices pour la démo
+            if (user === 'admin' && pass === '1234') {
+                document.getElementById('adminBox').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                msg.style.color = "var(--gain)";
+                msg.textContent = "Connexion réussie !";
+                renderAdminScoreEntry(); // Afficher la saisie des scores
+                renderAdminHistory(); // Afficher l'historique de suppression
+            } else {
+                msg.style.color = "var(--red)";
+                msg.textContent = "Identifiant ou mot de passe incorrect.";
+            }
+        });
+        
+        // Déconnexion Admin
+        function logoutAdmin(){
+            document.getElementById('adminBox').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminMessage').textContent = '';
+        }
+
+        // Réinitialisation du solde
+        function resetBalance(){
+            balance = 100; // Remet le solde à la valeur par défaut
+            localStorage.setItem('userBalance', balance);
+            document.getElementById('userBalanceDisplay').textContent = balance;
+
+            // Ajouter une transaction fictive de réinitialisation
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const resetTransaction = {
+                type: 'Réinitialisation',
+                amount: 'au 100', // Texte pour la réinitialisation
+                date: getFormattedDate()
+            };
+            transactions.unshift(resetTransaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            renderTransactionHistory();
+            
+            window.dispatchEvent(new Event('storage'));
+            alert("Le solde utilisateur a été réinitialisé à 100 crédits.");
+        }
+
+        // Supprimer un pari
+        function removeBet(index){
+            bets.splice(index, 1);
+            localStorage.setItem('betHistory', JSON.stringify(bets));
+            renderAdminHistory();
+            alert("Pari supprimé de l'historique.");
+            window.dispatchEvent(new Event('storage')); 
+        }
+
+        // Historique admin (avec suppression)
+        function renderAdminHistory(){
+            const container = document.getElementById('adminHistory');
+            // Récupérer l'historique mis à jour
+            bets = JSON.parse(localStorage.getItem('betHistory') || '[]');
+
+            if(bets.length===0){
+                container.innerHTML = '<div style="color:var(--muted)">Aucun pari effectué</div>';
+                return;
+            }
+            container.innerHTML = bets.map((h, idx)=>{
+                const sel = h.selections.map(s=>`${s.home} vs ${s.away} (${s.odd})`).join('<br>');
+                return `<div style="border-bottom:1px solid var(--glass); padding:10px 0; margin-bottom:10px">
+                            <div style="font-size:13px;color:var(--muted)">${h.date}</div>
+                            <div style="font-weight:600">Mise: ${h.stake} crédits — Potentiel: ${h.potential} crédits</div>
+                            <div style="font-size:13px; margin-top:4px; margin-bottom:8px">${sel}</div>
+                            <button class="remove-btn" onclick="removeBet(${idx})">Supprimer ce pari</button>
+                        </div>`;
+            }).join('');
+        }
+
+        // --- Initialisation et Synchronisation ---
+
+        document.addEventListener('DOMContentLoaded', ()=>{
+            // Charger le solde
+            const storedBalance = localStorage.getItem('userBalance');
+            if(storedBalance !== null){
+                balance = Number(storedBalance);
+            }
+            document.getElementById('userBalanceDisplay').textContent = balance;
+            
+            // Charger les paris (pour l'admin)
+            bets = JSON.parse(localStorage.getItem('betHistory') || '[]');
+            // Charger les tickets de prédictions (pour la saisie des scores)
+            preds = JSON.parse(localStorage.getItem('predictions') || '[]');
+
+            // Afficher l'historique des transactions utilisateur
+            renderTransactionHistory();
+        });
+
+        // Garder le solde et les données en synchronisation si changés sur une autre page
+        window.addEventListener('storage', (e)=>{
+            if(e.key === 'userBalance' && e.newValue !== null){
+                balance = Number(e.newValue);
+                document.getElementById('userBalanceDisplay').textContent = balance;
+            }
+            if(e.key === 'betHistory'){
+                bets = JSON.parse(localStorage.getItem('betHistory') || '[]');
+                if(document.getElementById('adminPanel').style.display === 'block'){
+                    renderAdminHistory();
+                }
+            }
+            if(e.key === 'predictions'){
+                preds = JSON.parse(localStorage.getItem('predictions') || '[]');
+                if(document.getElementById('adminPanel').style.display === 'block'){
+                    renderAdminScoreEntry();
+                }
+            }
+            if(e.key === 'transactions' || e.key === 'userBalance'){
+                 renderTransactionHistory();
+            }
+        });
+    </script>
 </body>
 </html>
