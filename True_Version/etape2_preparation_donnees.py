@@ -7,7 +7,7 @@ from xgboost import XGBClassifier
 
 # --- 1. Chargement des Données Prétraitées V7 ---
 try:
-    final_df = pd.read_csv('donnees_pretraitees_football_v7.csv')
+    final_df = pd.read_csv('True_Version/donnees_pretraitees_football_v7.csv')
     print("Fichier 'donnees_pretraitees_football_v7.csv' chargé avec succès.")
 except FileNotFoundError:
     print("ERREUR : Le fichier 'donnees_pretraitees_football_v7.csv' n'a pas été trouvé.")
