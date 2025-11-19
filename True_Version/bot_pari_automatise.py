@@ -4,15 +4,18 @@ import joblib
 import re
 from datetime import datetime
 
-# --- 0. Chargement du Modèle et des Données Sources (Identique) ---
+# --- 0. Chargement du Modèle et des Données Sources ---
 
+# Charger le modèle IA entraîné
 try:
-    model = joblib.load('best_football_model_v8.joblib')
+    model = joblib.load('True_Version/best_football_model_v8.joblib')
     print("Modèle IA 'best_football_model_v8.joblib' chargé avec succès.")
 except FileNotFoundError:
     print("ERREUR : Le fichier 'best_football_model_v8.joblib' n'a pas été trouvé.")
+    print("Veuillez d'abord lancer le script de la Version 8 modifié pour le créer.")
     exit()
 
+# Charger les données brutes pour calculer les features
 try:
     results_df = pd.read_csv('True_Version/results.csv')
     fifa_ranking_df = pd.read_csv('True_Version/fifa_ranking.csv')
@@ -21,7 +24,8 @@ except FileNotFoundError:
     print("ERREUR : Assurez-vous que les fichiers 'results.csv' et 'fifa_ranking.csv' sont dans le dossier 'True_Version'.")
     exit()
 
-# --- 1. Dictionnaire de Traduction (Identique) ---
+# --- 1. Dictionnaire de Traduction des Noms de Pays ---
+
 country_translation_map = {
     "Antigua-et-Barbuda": "Antigua and Barbuda", "États-Unis": "United States", "Uruguay": "Uruguay",
     "Colombie": "Colombia", "Australie": "Australia", "Équateur": "Ecuador", "Nouvelle-Zélande": "New Zealand",
@@ -32,9 +36,15 @@ country_translation_map = {
 }
 
 def translate_country(french_name):
+    """
+    Traduit un nom de pays français en anglais en utilisant le dictionnaire.
+    Si le pays n'est pas dans le dictionnaire, le nom original est retourné.
+    """
     return country_translation_map.get(french_name, french_name)
 
-# --- 2. Fonctions de Calcul de Features (Identiques) ---
+
+# --- 2. Copie des Fonctions de Calcul de Features ---
+
 fifa_ranking_df = fifa_ranking_df.rename(columns={'country_full': 'country', 'rank_date': 'date'})
 results_df = results_df.rename(columns={'date': 'date'})
 results_df['date'] = pd.to_datetime(results_df['date'])
@@ -83,7 +93,7 @@ def get_h2h_points_diff(home_team, away_team, date, matches=5):
             else: home_points += 3
     return home_points - away_points
 
-# --- 3. Extraction des Données depuis le HTML (Amélioré) ---
+# --- 3. Extraction des Matchs depuis le HTML ---
 
 html_content = """
 <!doctype html>
@@ -645,9 +655,35 @@ html_content = """
 
 """
 
-# Regex pour extraire les informations des matchs, y compris les cotes
+# --- NOUVEAU : Dictionnaire des résultats réels des matchs ---
+# L'identifiant (clé) correspond à l'attribut 'data-id' dans le HTML
+real_results = {
+    'm_a1': {'home_score': 1, 'away_score': 1},
+    'm_a2': {'home_score': 1, 'away_score': 4},
+    'm_a3': {'home_score': 2, 'away_score': 0},
+    'm_a4': {'home_score': 1, 'away_score': 0},
+    'm_a5': {'home_score': 0, 'away_score': 0},
+    'm_a6': {'home_score': 1, 'away_score': 1},
+    'm_c1': {'home_score': 2, 'away_score': 0},
+    'm_c2': {'home_score': 1, 'away_score': 0},
+    'm_c3': {'home_score': 3, 'away_score': 1},
+    'm_c4': {'home_score': 1, 'away_score': 2},
+    'm_c5': {'home_score': 0, 'away_score': 0},
+    'm_c6': {'home_score': 2, 'away_score': 0}
+}
+
+# --- NOUVEAU : Fonction pour déterminer le résultat d'un match ---
+def get_match_result(home_score, away_score):
+    if home_score > away_score:
+        return 1  # Victoire Domicile
+    elif home_score < away_score:
+        return 2  # Victoire Extérieur
+    else:
+        return 0  # Match Nul
+
+# MODIFIÉ : Regex pour extraire également l'identifiant du match
 match_pattern = re.compile(
-    r'<div class="card match-row"[^>]*data-home="([^"]*)"[^>]*data-away="([^"]*)"[^>]*data-odds="([^"]*)"',
+    r'<div class="card match-row"[^>]*data-id="([^"]*)"[^>]*data-home="([^"]*)"[^>]*data-away="([^"]*)"[^>]*data-odds="([^"]*)"',
     re.IGNORECASE
 )
 
@@ -655,22 +691,27 @@ matches = re.findall(match_pattern, html_content)
 
 if not matches:
     print("ERREUR : Aucun match trouvé dans le code HTML fourni.")
+    print("Veuillez vous assurer que le code HTML a été correctement copié entre les triples guillemets.")
     exit()
 
 # --- 4. Logique de Pari Automatisé avec Intégration des Cotes ---
 
-# NOUVEAU : Poids pour la combinaison des prédictions
+# NOUVEAU : Définir les poids pour la combinaison des prédictions
 # 0.7 pour l'IA, 0.3 pour les cotes du marché. Vous pouvez ajuster ces valeurs.
-WEIGHT_MODEL = 0.7
-WEIGHT_ODDS = 0.3
+WEIGHT_MODEL = 0.5
+WEIGHT_ODDS = 0.5
 
 def odds_to_probabilities(odds):
-    """Convertit une liste de cotes en probabilités normalisées."""
+    """
+    Convertit une liste de cotes en probabilités normalisées.
+    CORRECTION : Retourne un tableau NumPy pour les calculs mathématiques.
+    """
     # La probabilité implicite est 1 / cote
     implied_probs = [1 / odd for odd in odds]
     total_implied_prob = sum(implied_probs)
     # Normaliser pour que la somme soit égale à 1
-    normalized_probs = [p / total_implied_prob for p in implied_probs]
+    # CORRECTION : On convertit la liste en tableau NumPy avant de diviser
+    normalized_probs = np.array(implied_probs) / total_implied_prob
     return normalized_probs
 
 print("\n" + "="*50)
@@ -683,16 +724,20 @@ base_stake = 10.0
 result_map = {0: 'Match Nul', 1: 'Victoire Domicile', 2: 'Victoire Extérieur'}
 
 for i, match_data in enumerate(matches):
-    home_team_raw, away_team_raw, odds_str = match_data
+    # MODIFIÉ : Déballage de 4 éléments au lieu de 3
+    match_id, home_team_raw, away_team_raw, odds_str = match_data
     
     # Nettoyer et parser les noms des équipes et les cotes
-    home_team = translate_country(home_team_raw.strip())
-    away_team = translate_country(away_team_raw.strip())
     odds = list(map(float, odds_str.split(',')))
 
-    print(f"\n--- Analyse du match {i+1}/{len(matches)} : {home_team_raw} vs {away_team_raw} ---")
+    # NOUVEAU : Traduire les noms des pays avant de les utiliser
+    home_team = translate_country(home_team_raw.strip())
+    away_team = translate_country(away_team_raw.strip())
 
-    # Préparation des features pour le modèle IA
+    print(f"\n--- Analyse du match {i+1}/{len(matches)} : {home_team_raw} vs {away_team_raw} ---")
+    print(f"Traduit vers : {home_team} vs {away_team}")
+
+    # Préparation des features pour le modèle
     today = pd.to_datetime(datetime.now().strftime('%Y-%m-%d'))
     home_rank = get_fifa_rank(home_team, today)
     away_rank = get_fifa_rank(away_team, today)
@@ -707,26 +752,26 @@ for i, match_data in enumerate(matches):
         'away_team_form': [calculate_recent_form(away_team, today)],
         'home_goal_diff': [calculate_goal_difference(home_team, today)],
         'away_goal_diff': [calculate_goal_difference(away_team, today)],
-        'tournament_importance': [1], # Par défaut, considéré comme match amical
-        'is_neutral': [0], # Par défaut, pas de terrain neutre
+        'tournament_importance': [1],
+        'is_neutral': [0],
         'h2h_points_diff': [get_h2h_points_diff(home_team, away_team, today)]
     })
 
     # Prédiction de l'IA
     model_probs = model.predict_proba(match_features)[0]
     
-    # NOUVEAU : Conversion des cotes en probabilités du marché
+    # NOUVEAU : Obtenir les probabilités du marché
     market_probs = odds_to_probabilities(odds)
-
-    # NOUVEAU : Combinaison des probabilités
-    # On fait une moyenne pondérée des probabilités de l'IA et du marché
+    
+    # NOUVEAU : Combinaison pondérée des probabilités
+    # L'opération se fait maintenant sur deux tableaux NumPy, ce qui est valide
     final_probs = (model_probs * WEIGHT_MODEL) + (market_probs * WEIGHT_ODDS)
     
-    # Identifier le résultat le plus probable et sa probabilité finale
+    # Identifier le résultat le plus probable et sa probabilité
     predicted_index = np.argmax(final_probs)
     confidence = final_probs[predicted_index]
     
-    # Calcul de la mise proportionnelle à la confiance finale
+    # Calcul de la mise proportionnelle à la confiance
     stake = base_stake * confidence
 
     # Vérifier si le solde est suffisant
@@ -738,12 +783,36 @@ for i, match_data in enumerate(matches):
     bankroll -= stake
     
     # Affichage des résultats détaillés
-    print(f"Prédiction de l'IA : {result_map[np.argmax(model_probs)]} (Confiance: {np.max(model_probs):.2%})")
-    print(f"Probabilités du Marché : Victoire Domicile: {market_probs[1]:.2%} | Nul: {market_probs[0]:.2%} | Victoire Extérieur: {market_probs[2]:.2%}")
-    print(f"Probabilités FINALES (combinées) : Victoire Domicile: {final_probs[1]:.2%} | Nul: {final_probs[0]:.2%} | Victoire Extérieur: {final_probs[2]:.2%}")
+    print(f"Prédiction de l'IA (Poids {WEIGHT_MODEL*100:.0f}%): Victoire Domicile: {model_probs[1]:.2%} | Nul: {model_probs[0]:.2%} | Victoire Extérieur: {model_probs[2]:.2%}")
+    print(f"Probabilités du Marché (Poids {WEIGHT_ODDS*100:.0f}%): Victoire Domicile: {market_probs[1]:.2%} | Nul: {market_probs[0]:.2%} | Victoire Extérieur: {market_probs[2]:.2%}")
+    print(f"Probabilités FINALES (combinées): Victoire Domicile: {final_probs[1]:.2%} | Nul: {final_probs[0]:.2%} | Victoire Extérieur: {final_probs[2]:.2%}")
     print(f"Confiance finale : {confidence:.2%}")
     print(f"MISE AUTOMATISÉE : {stake:.2f} crédits sur {result_map[predicted_index]}")
+    
+    # --- NOUVEAU : Vérification du résultat réel et calcul du gain ---
+    if match_id in real_results:
+        real_result = real_results[match_id]
+        real_home_score = real_result['home_score']
+        real_away_score = real_result['away_score']
+        
+        # Déterminer le résultat réel (0: Nul, 1: Domicile, 2: Extérieur)
+        actual_result_index = get_match_result(real_home_score, real_away_score)
+        
+        print(f"Résultat réel : {home_team_raw} {real_home_score} - {real_away_score} {away_team_raw}")
+        
+        if predicted_index == actual_result_index:
+            # Le pari est gagnant
+            winnings = stake * odds[predicted_index]
+            bankroll += winnings
+            print(f"PARI GAGNÉ ! Gain de {winnings:.2f} crédits.")
+        else:
+            # Le pari est perdu
+            print(f"PARI PERDU. Perte de {stake:.2f} crédits.")
+    else:
+        print(f"ATTENTION : Le résultat réel pour le match ID '{match_id}' n'est pas connu.")
+    
     print(f"Nouveau solde : {bankroll:.2f} crédits")
+
 
 # --- 5. Résumé Final ---
 print("\n" + "="*50)
@@ -753,6 +822,6 @@ print(f"Solde initial : 1000.00 crédits")
 print(f"Solde final : {bankroll:.2f} crédits")
 print(f"Résultat net : {bankroll - 1000:.2f} crédits")
 if bankroll > 1000:
-    print("🎉 Le bot est globalement gagnant !")
+    print("Le bot est globalement gagnant !")
 else:
-    print("😞 Le bot est globalement perdant.")
+    print("Le bot est globalement perdant.")

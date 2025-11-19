@@ -10,7 +10,7 @@ from tkinter import scrolledtext
 
 # Charger le modèle entraîné
 try:
-    model = joblib.load('best_football_model_v8.joblib')
+    model = joblib.load('True_Version/best_football_model_v8.joblib')
     print("Modèle IA chargé avec succès.")
 except FileNotFoundError:
     print("ERREUR : Le fichier 'best_football_model_v8.joblib' n'a pas été trouvé.")
