@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -87,3 +88,9 @@ def predict_match_v8(home_team, away_team, tournament_name, is_neutral_ground, m
 
 # Exemple d'utilisation de la prédiction (si la fonction est implémentée)
 # predict_match_v8('France', 'Brazil', 'FIFA World Cup', True, best_xgb_v8)
+# --- NOUVEAU : Sauvegarde du modèle entraîné ---
+model_filename = 'best_football_model_v8.joblib'
+joblib.dump(best_xgb_v8, model_filename)
+
+print(f"\nLe modèle champion a été sauvegardé avec succès dans le fichier : '{model_filename}'")
+print("Vous pouvez maintenant lancer le script de prédiction interactif.")
