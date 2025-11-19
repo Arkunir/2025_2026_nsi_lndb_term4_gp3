@@ -175,6 +175,22 @@
       <input type="number" id="adminBalance" min="0">
       <button onclick="updateBalance()">Mettre à jour</button>
     </div>
+
+    <!-- Saisie des scores officiels -->
+    <div style="margin-bottom:15px;">
+      <label for="matchSelect">Sélectionner le match :</label>
+      <select id="matchSelect">
+        <option value="m1">France vs Brésil</option>
+        <option value="m2">Argentine vs Portugal</option>
+        <option value="m3">Espagne vs Allemagne</option>
+        <option value="m4">Italie vs Pays-Bas</option>
+      </select>
+    </div>
+    <div style="margin-bottom:15px;">
+      <label for="finalScore">Score officiel :</label>
+      <input type="text" id="finalScore" placeholder="ex: 2-1">
+      <button onclick="setFinalScore()">Enregistrer score</button>
+    </div>
     
     <!-- Historique des paris -->
     <div style="margin-bottom:15px;">
@@ -196,7 +212,7 @@
     border-radius: 10px;
     text-align: center;
   }
-  .admin-box input, .admin-panel input {
+  .admin-box input, .admin-panel input, .admin-panel select {
     width: 70%;
     padding: 5px;
     margin-right: 10px;
@@ -228,28 +244,46 @@
         ? Number(localStorage.getItem('userBalance')) 
         : 1000; // Valeur par défaut si aucune donnée n'est sauvegardée
 
-    // Restaurer le solde depuis localStorage au chargement de la page
-    document.addEventListener('DOMContentLoaded', () => {
-        const balanceEl = document.getElementById('solde');
-        if (balanceEl) balanceEl.textContent = balance;
-    });
+  // objet pour stocker les scores officiels
+  const officialScores = JSON.parse(localStorage.getItem('officialScores') || '{}');
 
-    // Mettre à jour le solde
-    function updateBalance() {
-        const newBalance = Number(document.getElementById('adminBalance').value);
-        if (!isNaN(newBalance) && newBalance >= 0) {
-            balance = newBalance;
-            const balanceEl = document.getElementById('solde');
-            if (balanceEl) balanceEl.textContent = balance;
+  // Restaurer le solde depuis localStorage au chargement de la page
+  document.addEventListener('DOMContentLoaded', () => {
+      const balanceEl = document.getElementById('solde');
+      if (balanceEl) balanceEl.textContent = balance;
+  });
 
-            // Sauvegarder le solde dans localStorage
-            localStorage.setItem('userBalance', balance);
+  // Mettre à jour le solde
+  function updateBalance() {
+      const newBalance = Number(document.getElementById('adminBalance').value);
+      if (!isNaN(newBalance) && newBalance >= 0) {
+          balance = newBalance;
+          const balanceEl = document.getElementById('solde');
+          if (balanceEl) balanceEl.textContent = balance;
 
-            alert("Solde mis à jour !");
-        } else {
-            alert("Entrez une valeur valide !");
-        }
-    }
+          // Sauvegarder le solde dans localStorage
+          localStorage.setItem('userBalance', balance);
+
+          alert("Solde mis à jour !");
+      } else {
+          alert("Entrez une valeur valide !");
+      }
+  }
+
+  // Enregistrer un score officiel
+  function setFinalScore() {
+      const matchId = document.getElementById('matchSelect').value;
+      const score = document.getElementById('finalScore').value.trim();
+
+      if(!score.match(/^\d+-\d+$/)) {
+          alert('Format invalide, exemple: 2-1');
+          return;
+      }
+
+      officialScores[matchId] = score;
+      localStorage.setItem('officialScores', JSON.stringify(officialScores));
+      alert(`Score officiel de ${matchId} enregistré : ${score}`);
+  }
   
   // Connexion admin
   document.getElementById('adminForm').addEventListener('submit', function(event){
@@ -257,7 +291,7 @@
     const user = document.getElementById('adminUser').value;
     const pass = document.getElementById('adminPass').value;
     const msg = document.getElementById('adminMessage');
-  
+
     if(user === "admin" && pass === "admin123"){
       msg.style.color = "#00ff00";
       msg.textContent = "Connexion réussie !";
@@ -277,8 +311,8 @@
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('adminMessage').textContent = '';
   }
-  
-  // Affichage de l'historique admin avec suppression
+
+  // Historique admin (avec suppression)
   function renderAdminHistory(){
     const container = document.getElementById('adminHistory');
     if(history.length===0){
@@ -295,19 +329,17 @@
               </div>`;
     }).join('');
   }
-  
+
   // Supprimer un pari
   function removeBet(idx){
     if(confirm("Supprimer ce pari ?")){
       history.splice(idx,1);
-      renderAdminHistory(); // mettre à jour l'affichage admin
-      renderHistory(); // mettre à jour l'affichage utilisateur
+      renderAdminHistory();
+      renderHistory(); // mise à jour côté utilisateur
     }
   }
+
   </script>
-  
-  
-  
 
 </body>
 </html>

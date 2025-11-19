@@ -10,120 +10,305 @@
     :root{
       --red:#E30613;
       --dark:#121212;
-      --muted:#6b6b6b;
+      --muted:#888;
       --bg:#0f1113;
       --card:#151617;
       --white:#ffffff;
-      font-family: 'Inter';
+      --green:#25c54a;
+      --blue:#1e90ff;
+      --orange:#ff9c27;
+      --glass: rgba(255,255,255,0.04);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto;
     }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#070e12);color:white;min-height:100vh}
 
-    body{margin:0;background:linear-gradient(180deg,var(--bg),#071014);color:var(--white);min-height:100vh}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:46px;height:46px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700}
-    nav{display:flex;gap:18px;align-items:center}
-    nav a{color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600}
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:18px 24px;
+    }
+    nav{display:flex;gap:18px}
+    nav a{text-decoration:none;color:white;font-weight:600}
     nav a.active{color:var(--red);border-bottom:2px solid var(--red)}
 
-    .container{max-width:1200px;margin:18px auto;padding:0 18px}
+    .container{max-width:1200px;margin:18px auto;padding:0 20px}
+
     .card{
       background:var(--card);
-      padding:18px;
+      padding:20px;
       border-radius:12px;
-      margin-bottom:18px;
-      box-shadow:0 0 18px rgba(0,0,0,0.25);
+      margin-bottom:20px;
+      box-shadow:0 0 14px rgba(0,0,0,0.25);
     }
 
-    .match-header{
+    h2{margin-top:0}
+
+    .match{
+      padding:14px;
+      background:var(--glass);
+      border-radius:10px;
+      margin-bottom:12px;
+    }
+
+    .status{
+      padding:6px 10px;
+      border-radius:6px;
+      font-weight:700;
+      display:inline-block;
+      margin-top:6px;
+      color:#fff;
+      font-size:13px;
+    }
+    .win{background:var(--green)}
+    .loss{background:var(--red)}
+    .pending{background:var(--orange)}
+    .refund{background:var(--blue)}
+
+    input{
+      padding:6px;
+      border-radius:6px;
+      border:none;
+      outline:none;
+      background:#222;
+      color:white;
+      width:60px;
+      text-align:center;
+      font-weight:600;
+    }
+
+    button{
+      background:var(--red);
+      border:none;
+      padding:8px 14px;
+      border-radius:6px;
+      cursor:pointer;
+      color:white;
+      font-weight:700;
+      margin-top:10px;
+    }
+
+    .topline{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      font-size:20px;
-      font-weight:700;
+      gap:12px;
+      margin-bottom:12px;
     }
 
-    .score{
-      font-size:28px;
-      font-weight:700;
-    }
-
-    .stats{
-      margin-top:14px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      font-size:14px;
-    }
-
-    .line{
-      display:flex;
-      justify-content:space-between;
-      background:rgba(255,255,255,0.04);
-      padding:10px;
+    .balance-box{
+      background:rgba(255,255,255,0.02);
+      padding:8px 12px;
       border-radius:8px;
     }
 
+    .filters{display:flex;gap:8px;flex-wrap:wrap}
+    .small-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:6px;color:white;cursor:pointer}
   </style>
 </head>
-
 <body>
 
 <header>
-  <div class="brand container" style="max-width:1200px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="logo">BF</div>
-      <div>
-        <div style="font-weight:700">BetFoot</div>
-        <div style="font-size:12px;color:var(--muted)">Reproduction Betclic — Version Foot</div>
-      </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="background:var(--red);width:46px;height:46px;border-radius:8px;
+                display:flex;justify-content:center;align-items:center;font-weight:700">
+      BF
     </div>
-    <nav>
-      <a href="interface.html">Accueil</a>
-      <a href="live.html">Matchs en direct</a>
-      <a href="paris.html">Paris</a>
-      <a href="resultats.html" class="active">Résultats</a>
-      <a href="compte.html">Mon compte</a>
-    </nav>
+    <div>
+      <div style="font-weight:700">BetFoot</div>
+      <div style="font-size:12px;color:var(--muted)">Résultats des paris</div>
+    </div>
   </div>
+
+  <nav>
+    <a href="interface.html">Accueil</a>
+    <a href="live.html">Matchs en direct</a>
+    <a href="paris.html">Paris</a>
+    <a href="resultats.html" class="active">Résultats</a>
+    <a href="compte.html">Mon compte</a>
+  </nav>
 </header>
 
 <main class="container">
-  <h2>Résultats récents</h2>
-  <p class="meta" style="color:var(--muted)">Matchs internationaux terminés</p>
 
-  <!-- Exemple de résultat -->
-  <div class="card">
-    <div class="match-header">
-      <div>France vs Allemagne</div>
-      <div class="score">2 - 1</div>
+  <div id="awaitMsg" style="display:none;color:#ffcc00;background:#332b00;padding:10px;border-radius:6px;margin-bottom:20px;">
+    ⚠️ Les résultats ne sont pas encore disponibles pour certains matchs.<br>
+    Veuillez patienter : un administrateur doit saisir les scores officiels.
+  </div>
+
+  <div class="topline">
+    <div>
+      <h2>Résultats de vos prévisions</h2>
+      <p style="color:var(--muted)">Gestion des résultats & remboursements automatiques</p>
     </div>
 
-    <div class="stats">
-      <div class="line">
-        <div>Possession</div>
-        <div>56% - 44%</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="balance-box">
+        Solde : <strong id="balanceDisplay">--</strong> crédits
       </div>
-
-      <div class="line">
-        <div>Tirs</div>
-        <div>12 - 8</div>
-      </div>
-
-      <div class="line">
-        <div>Expected Goals (xG)</div>
-        <div>1.87 - 1.10</div>
-      </div>
-
-      <div class="line">
-        <div>Buts par minute</div>
-        <div>34’, 71’ — 65’</div>
+      <div class="filters">
+        <button class="small-btn" onclick="filterShow('all')">Tous</button>
+        <button class="small-btn" onclick="filterShow('win')">Gagnés</button>
+        <button class="small-btn" onclick="filterShow('refund')">Remboursés</button>
+        <button class="small-btn" onclick="filterShow('loss')">Perdus</button>
+        <button class="small-btn" onclick="filterShow('pending')">En attente</button>
       </div>
     </div>
   </div>
 
-  <!-- Dupliquer pour autres matchs -->
+  <div id="results"></div>
 
 </main>
+
+<script>
+
+function getWinner(h,a){
+  if(h > a) return 'home';
+  if(a > h) return 'away';
+  return 'draw';
+}
+
+let preds = JSON.parse(localStorage.getItem("matchPredictions") || "[]");
+let bets  = JSON.parse(localStorage.getItem("betHistory") || "[]");
+let balance = Number(localStorage.getItem("userBalance") || 1000);
+
+const isAdmin = localStorage.getItem("isAdmin") === "true";
+
+document.getElementById("balanceDisplay").textContent = balance;
+
+if(!isAdmin){
+  document.getElementById("awaitMsg").style.display="block";
+}
+
+const container = document.getElementById("results");
+
+function renderResults(filter="all"){
+  container.innerHTML = "";
+
+  preds.forEach((ticket, tIndex)=>{
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h3>Ticket du ${ticket.betDate}</h3>`;
+
+    let showTicket = false;
+
+    ticket.predictions.forEach((m, mIndex)=>{
+
+      const realH = m.realHome ?? "";
+      const realA = m.realAway ?? "";
+
+      let status = "pending";
+      let statusText = "EN ATTENTE";
+
+      if(realH !== "" && realA !== ""){
+        if(realH == m.predictedHome && realA == m.predictedAway){
+          status = "win"; statusText="GAGNÉ";
+        } else {
+          const wPred = getWinner(m.predictedHome, m.predictedAway);
+          const wReal = getWinner(realH, realA);
+          if(wPred === wReal){
+            status="refund"; statusText="REMBOURSÉ";
+          } else {
+            status="loss"; statusText="PERDU";
+          }
+        }
+      }
+
+      if(filter==="all" || filter===status) showTicket = true;
+
+      let htmlScore = "";
+
+      if(isAdmin){
+        htmlScore = `
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span>Score réel :</span>
+            <input type="number" min="0" id="realH_${tIndex}_${mIndex}" value="${realH}">
+            <span>-</span>
+            <input type="number" min="0" id="realA_${tIndex}_${mIndex}" value="${realA}">
+            <button onclick="saveRealScore(${tIndex}, ${mIndex})">Enregistrer</button>
+          </div>
+        `;
+      } else {
+        htmlScore = `
+          <div style="color:#ccc;margin-bottom:10px;">
+            Score réel : <strong>En attente d’un administrateur</strong>
+          </div>
+        `;
+      }
+
+      const matchDiv = document.createElement("div");
+      matchDiv.className = "match";
+      matchDiv.innerHTML = `
+        <b>${m.home} ${m.predictedHome} - ${m.predictedAway} ${m.away}</b><br>
+        <small style="color:#aaa">Votre prévision</small>
+        <br><br>
+        ${htmlScore}
+        <span class="status ${status}">${statusText}</span>
+      `;
+
+      card.appendChild(matchDiv);
+
+    });
+
+    if(showTicket) container.appendChild(card);
+
+  });
+}
+
+function findStake(ticketDate){
+  const b = bets.find(x=>x.date===ticketDate);
+  return b ? Number(b.stake) : null;
+}
+
+function saveRealScore(tIndex, mIndex){
+  const t = preds[tIndex];
+  const m = t.predictions[mIndex];
+
+  const rH = Number(document.getElementById(`realH_${tIndex}_${mIndex}`).value);
+  const rA = Number(document.getElementById(`realA_${tIndex}_${mIndex}`).value);
+
+  if(isNaN(rH) || isNaN(rA)){
+    alert("Entrez un score valide.");
+    return;
+  }
+
+  m.realHome = rH;
+  m.realAway = rA;
+
+  let status = "";
+
+  if(rH === m.predictedHome && rA === m.predictedAway){
+    status="win";
+  } else {
+    const wPred = getWinner(m.predictedHome,m.predictedAway);
+    const wReal = getWinner(rH,rA);
+    status = (wPred===wReal) ? "refund" : "loss";
+  }
+
+  if(status==="refund" && !m._refunded){
+    const stakeTotal = findStake(t.betDate);
+    if(stakeTotal){
+      const perMatch = stakeTotal / t.predictions.length;
+      balance += perMatch;
+      localStorage.setItem("userBalance", balance);
+      m._refunded = true;
+      alert("Match remboursé : +" + perMatch.toFixed(2) + " crédits.");
+    }
+  }
+
+  localStorage.setItem("matchPredictions", JSON.stringify(preds));
+  renderResults();
+}
+
+renderResults();
+
+function filterShow(k){
+  renderResults(k);
+}
+
+</script>
 
 </body>
 </html>
